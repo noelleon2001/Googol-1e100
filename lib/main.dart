@@ -1,13 +1,19 @@
+import 'package:camera/camera.dart';
+
 import 'package:flutter/material.dart';
 import 'home_page.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'firebase_options.dart';
+
+List<CameraDescription> cameras = [];
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
+
+  cameras = await availableCameras();
   runApp(const MyApp());
 }
 
@@ -41,7 +47,7 @@ class _NavigationBarWidgetState extends State<NavigationBarWidget> {
   static const TextStyle optionStyle = TextStyle(fontSize: 30, fontWeight: FontWeight.bold);
 
   static const List<Widget> _widgetOptions = <Widget>[
-    HomePage(),
+    ObjectDetectorView(),
     //Create the other widgets here
     Text(
       'Index 1: Map',
