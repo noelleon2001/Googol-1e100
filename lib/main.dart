@@ -1,12 +1,13 @@
-import 'package:camera/camera.dart';
-
 import 'package:flutter/material.dart';
-import 'home_page.dart';
+import 'package:camera/camera.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'firebase_options.dart';
 
+import 'object_detector_view.dart';
+
 List<CameraDescription> cameras = [];
 
+/* Entry point to the app */
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(
@@ -17,17 +18,18 @@ Future<void> main() async {
   runApp(const MyApp());
 }
 
+/*High level App widget*/
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Flutter Demo',
+      title: 'BinBrain',
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
-      home:  NavigationBarWidget(),
+      home:  const NavigationBarWidget(),
       debugShowCheckedModeBanner: false,
     );
   }
@@ -72,9 +74,6 @@ class _NavigationBarWidgetState extends State<NavigationBarWidget> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('BinBrain'),
-      ),
       body: Center(
         child: _widgetOptions.elementAt(_selectedIndex),
       ),
