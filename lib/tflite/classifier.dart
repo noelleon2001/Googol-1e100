@@ -17,7 +17,7 @@ class Classifier {
   /// Labels file loaded as list
   List<String> _labels;
 
-  static const String MODEL_FILE_NAME = "detect.tflite";
+  static String MODEL_FILE_NAME = "detect.tflite";
   static const String LABEL_FILE_NAME = "labelmap.txt";
 
   /// Input size of image (height = width = 300)
@@ -47,6 +47,10 @@ class Classifier {
   }) {
     loadModel(interpreter: interpreter);
     loadLabels(labels: labels);
+  }
+
+  static void set_model_file_path(String file_path){
+    MODEL_FILE_NAME = file_path;
   }
 
   /// Loads interpreter from asset
