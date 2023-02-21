@@ -1,16 +1,37 @@
+import 'dart:io';
+
 import 'package:camera/camera.dart';
 import 'package:image/image.dart' as imageLib;
+import 'package:path_provider/path_provider.dart';
 
 /// ImageUtils
 class ImageUtils {
+  /// Converts a [CameraImage] in YUV420 format to [imageLib.Image] in RGB format
+  static imageLib.Image convertCameraImage(CameraImage cameraImage) {
+    if (cameraImage.format.group == ImageFormatGroup.yuv420) {
+      return convertYUV420ToImage(cameraImage);
+    } else if (cameraImage.format.group == ImageFormatGroup.bgra8888) {
+      return convertBGRA8888ToImage(cameraImage);
+    } else {
+      return null;
+    }
+  }
+
+  /// Converts a [CameraImage] in BGRA888 format to [imageLib.Image] in RGB format
+  static imageLib.Image convertBGRA8888ToImage(CameraImage cameraImage) {
+    imageLib.Image img = imageLib.Image.fromBytes(cameraImage.planes[0].width,
+        cameraImage.planes[0].height, cameraImage.planes[0].bytes,
+        format: imageLib.Format.bgra);
+    return img;
+  }
+
   /// Converts a [CameraImage] in YUV420 format to [imageLib.Image] in RGB format
   static imageLib.Image convertYUV420ToImage(CameraImage cameraImage) {
     final int width = cameraImage.width;
     final int height = cameraImage.height;
 
     final int uvRowStride = cameraImage.planes[1].bytesPerRow;
-    //TODO: Look into assertion
-    final int uvPixelStride = cameraImage.planes[1].bytesPerPixel!;
+    final int uvPixelStride = cameraImage.planes[1].bytesPerPixel;
 
     final image = imageLib.Image(width, height);
 
@@ -43,8 +64,17 @@ class ImageUtils {
     b = b.clamp(0, 255);
 
     return 0xff000000 |
-    ((b << 16) & 0xff0000) |
-    ((g << 8) & 0xff00) |
-    (r & 0xff);
+        ((b << 16) & 0xff0000) |
+        ((g << 8) & 0xff00) |
+        (r & 0xff);
+  }
+
+  static void saveImage(imageLib.Image image, [int i = 0]) async {
+    List<int> jpeg = imageLib.JpegEncoder().encodeImage(image);
+    final appDir = await getTemporaryDirectory();
+    final appPath = appDir.path;
+    final fileOnDevice = File('$appPath/out$i.jpg');
+    await fileOnDevice.writeAsBytes(jpeg, flush: true);
+    print('Saved $appPath/out$i.jpg');
   }
 }
