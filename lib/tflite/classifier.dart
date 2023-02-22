@@ -1,4 +1,3 @@
-import 'dart:async';
 import 'dart:io';
 import 'dart:math';
 import 'dart:ui';
@@ -10,6 +9,7 @@ import 'package:tflite_flutter_helper/tflite_flutter_helper.dart';
 
 import 'recognition.dart';
 import 'stats.dart';
+import '../firebase.dart';
 
 enum ModelMode{
   network,
@@ -46,16 +46,7 @@ class Classifier {
   /// Number of results to show
   static const int NUM_RESULTS = 10;
 
-  ///Classifier has two modes, either fetches model from the network or uses local
-  ///mode available in assets
-  static ModelMode classifierMode = ModelMode.network;
-
-  ///File names for models available on assets
-  static String DEFAULT_MODEL_FILE_NAME = "detect.tflite";
   static const String DEFAULT_LABEL_FILE_NAME = "labelmap.txt";
-
-  ///File object for the network model, if used
-  static File networkModelFile;
 
   Classifier({
     Interpreter interpreter,
@@ -66,48 +57,19 @@ class Classifier {
   }
 
 
-  static void setModelMode({ModelMode mode, File modelPath}){
-    classifierMode = mode;
-    networkModelFile = modelPath;
-  }
-
-  Future<Interpreter> loadModelFromAsset() {
-    return Interpreter.fromAsset(
-        DEFAULT_MODEL_FILE_NAME,
-        options: InterpreterOptions()..threads = 4);
-  }
-
-  Interpreter loadModelFromFile(){
-    return Interpreter.fromFile(
-        networkModelFile,
-        options: InterpreterOptions()..threads = 4
-    );
-  }
-
-
   /// Loads interpreter from asset
   void loadModel({Interpreter interpreter}) async {
     try {
-      print('Path here: $networkModelFile');
-      print('Mode: $classifierMode');
-      // if (interpreter == null){
-      //     switch (classifierMode){
-      //       case ModelMode.network:
-      //         _interpreter = loadModelFromFile();
-      //         print('Interpreter : $_interpreter');
-      //         break;
-      //       case ModelMode.asset:
-      //         _interpreter = await loadModelFromAsset();
-      //         break;
-      //    }
-      // }
 
-      _interpreter = interpreter ??
-          await Interpreter.fromAsset(
-          DEFAULT_MODEL_FILE_NAME,
-          options: InterpreterOptions()..threads = 4,
-        );
-
+      if (interpreter == null) {
+        if (ModelDownloader.interpreter != null){
+          _interpreter = ModelDownloader.interpreter;
+        } else{
+          _interpreter = await ModelDownloader.loadModelFromAsset();
+        }
+      } else{
+        _interpreter = interpreter;
+      }
 
       var outputTensors = _interpreter.getOutputTensors();
       _outputShapes = [];
