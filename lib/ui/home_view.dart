@@ -1,10 +1,10 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:bin_brain/tflite/recognition.dart';
-import 'package:bin_brain/tflite/stats.dart';
-import 'package:bin_brain/ui/box_widget.dart';
-import 'package:bin_brain/ui/camera_view_singleton.dart';
+import '../tflite/recognition.dart';
+import '../tflite/stats.dart';
 
+import 'box_widget.dart';
+import 'camera_view_singleton.dart';
 import 'camera_view.dart';
 
 /// [HomeView] stacks [CameraView] and [BoxWidget]s with bottom sheet for stats

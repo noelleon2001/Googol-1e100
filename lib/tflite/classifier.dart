@@ -1,13 +1,21 @@
+import 'dart:async';
+import 'dart:io';
 import 'dart:math';
 import 'dart:ui';
 
 import 'package:flutter/material.dart';
 import 'package:image/image.dart' as imageLib;
-import 'package:bin_brain/tflite/recognition.dart';
 import 'package:tflite_flutter/tflite_flutter.dart';
 import 'package:tflite_flutter_helper/tflite_flutter_helper.dart';
 
+import 'recognition.dart';
 import 'stats.dart';
+
+enum ModelMode{
+  network,
+  asset
+}
+
 
 /// Classifier
 class Classifier {
@@ -16,9 +24,6 @@ class Classifier {
 
   /// Labels file loaded as list
   List<String> _labels;
-
-  static String MODEL_FILE_NAME = "detect.tflite";
-  static const String LABEL_FILE_NAME = "labelmap.txt";
 
   /// Input size of image (height = width = 300)
   static const int INPUT_SIZE = 300;
@@ -41,6 +46,17 @@ class Classifier {
   /// Number of results to show
   static const int NUM_RESULTS = 10;
 
+  ///Classifier has two modes, either fetches model from the network or uses local
+  ///mode available in assets
+  static ModelMode classifierMode = ModelMode.network;
+
+  ///File names for models available on assets
+  static String DEFAULT_MODEL_FILE_NAME = "detect.tflite";
+  static const String DEFAULT_LABEL_FILE_NAME = "labelmap.txt";
+
+  ///File object for the network model, if used
+  static File networkModelFile;
+
   Classifier({
     Interpreter interpreter,
     List<String> labels,
@@ -49,18 +65,49 @@ class Classifier {
     loadLabels(labels: labels);
   }
 
-  static void set_model_file_path(String file_path){
-    MODEL_FILE_NAME = file_path;
+
+  static void setModelMode({ModelMode mode, File modelPath}){
+    classifierMode = mode;
+    networkModelFile = modelPath;
   }
+
+  Future<Interpreter> loadModelFromAsset() {
+    return Interpreter.fromAsset(
+        DEFAULT_MODEL_FILE_NAME,
+        options: InterpreterOptions()..threads = 4);
+  }
+
+  Interpreter loadModelFromFile(){
+    return Interpreter.fromFile(
+        networkModelFile,
+        options: InterpreterOptions()..threads = 4
+    );
+  }
+
 
   /// Loads interpreter from asset
   void loadModel({Interpreter interpreter}) async {
     try {
+      print('Path here: $networkModelFile');
+      print('Mode: $classifierMode');
+      // if (interpreter == null){
+      //     switch (classifierMode){
+      //       case ModelMode.network:
+      //         _interpreter = loadModelFromFile();
+      //         print('Interpreter : $_interpreter');
+      //         break;
+      //       case ModelMode.asset:
+      //         _interpreter = await loadModelFromAsset();
+      //         break;
+      //    }
+      // }
+
       _interpreter = interpreter ??
           await Interpreter.fromAsset(
-            MODEL_FILE_NAME,
-            options: InterpreterOptions()..threads = 4,
-          );
+          DEFAULT_MODEL_FILE_NAME,
+          options: InterpreterOptions()..threads = 4,
+        );
+
 
       var outputTensors = _interpreter.getOutputTensors();
       _outputShapes = [];
@@ -78,7 +125,7 @@ class Classifier {
   void loadLabels({List<String> labels}) async {
     try {
       _labels =
-          labels ?? await FileUtil.loadLabels("assets/" + LABEL_FILE_NAME);
+          labels ?? await FileUtil.loadLabels("assets/" + DEFAULT_LABEL_FILE_NAME);
     } catch (e) {
       print("Error while loading labels: $e");
     }

@@ -7,7 +7,7 @@ import 'package:bin_brain/tflite/classifier.dart';
 import 'package:bin_brain/tflite/recognition.dart';
 import 'package:bin_brain/tflite/stats.dart';
 import 'package:bin_brain/ui/camera_view_singleton.dart';
-import 'package:bin_brain/utils/isolate_utils.dart';
+import '../utils/isolate_utils.dart';
 
 /// [CameraView] sends each frame for inference
 class CameraView extends StatefulWidget {

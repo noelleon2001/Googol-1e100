@@ -1,26 +1,34 @@
 import 'package:firebase_ml_model_downloader/firebase_ml_model_downloader.dart';
+import "dart:async";
 
-void downloadModel(){
-  FirebaseModelDownloader.instance
-      .getModel(
-      "waste-detector",
-      FirebaseModelDownloadType.localModelUpdateInBackground,
-      FirebaseModelDownloadConditions(
-        iosAllowsCellularAccess: true,
-        iosAllowsBackgroundDownloading: false,
-        androidChargingRequired: false,
-        androidWifiRequired: false,
-        androidDeviceIdleRequired: false,
-      )
-  )
-      .then((customModel) {
-    // Download complete. Depending on your app, you could enable the ML
-    // feature, or switch from the local model to the remote model, etc.
+import 'tflite/classifier.dart';
 
-    // The CustomModel object contains the local path of the model file,
-    // which you can use to instantiate a TensorFlow Lite interpreter.
-    final localModelPath = customModel.file;
-    print(localModelPath);
-    // ...
-  });
+
+class ModelDownloader{
+   static Future<FirebaseCustomModel> download() async {
+
+    try {
+      final FirebaseCustomModel model = await FirebaseModelDownloader.instance
+          .getModel(
+          "waste-detector",
+          FirebaseModelDownloadType.localModelUpdateInBackground,
+          FirebaseModelDownloadConditions(
+            iosAllowsCellularAccess: true,
+            iosAllowsBackgroundDownloading: false,
+            androidChargingRequired: false,
+            androidWifiRequired: false,
+            androidDeviceIdleRequired: false,
+          ));
+
+      final localModelPath = model.file;
+      print("Path in source : $localModelPath");
+      Classifier.setModelMode(mode: ModelMode.asset);
+      // Classifier.setModelMode(mode:ModelMode.network, modelPath: localModelPath);
+    } on Exception catch (e) {
+      print("Firebase model load error");
+      Classifier.setModelMode(mode: ModelMode.asset);
+    }
+  }
 }
+
+

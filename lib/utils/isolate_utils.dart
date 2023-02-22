@@ -3,9 +3,11 @@ import 'dart:isolate';
 
 import 'package:camera/camera.dart';
 import 'package:image/image.dart' as imageLib;
-import 'package:bin_brain/tflite/classifier.dart';
-import 'package:bin_brain/utils/image_utils.dart';
 import 'package:tflite_flutter/tflite_flutter.dart';
+
+import '../tflite/classifier.dart';
+import 'image_utils.dart';
+
 
 /// Manages separate Isolate instance for inference
 class IsolateUtils {
@@ -34,7 +36,7 @@ class IsolateUtils {
     await for (final IsolateData isolateData in port) {
       if (isolateData != null) {
         Classifier classifier = Classifier(
-            interpreter:
+            interpreter: 
                 Interpreter.fromAddress(isolateData.interpreterAddress),
             labels: isolateData.labels);
         imageLib.Image image =
