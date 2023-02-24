@@ -1,23 +1,29 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
-import 'package:object_detection/ui/home_view.dart';
+import 'package:camera/camera.dart';
+import 'home.dart';
 
-void main() async {
+List<CameraDescription> cameras;
+
+Future<Null> main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
-  runApp(MyApp());
+  try {
+    cameras = await availableCameras();
+  } on CameraException catch (e) {
+    print('Error: $e.code\nError Message: $e.message');
+  }
+  runApp(new MyApp());
 }
 
 class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Object Detection TFLite',
+      title: 'tflite real-time detection',
       theme: ThemeData(
-        primarySwatch: Colors.blue,
-        visualDensity: VisualDensity.adaptivePlatformDensity,
+        brightness: Brightness.dark,
       ),
-      home: HomeView(),
+      home: HomePage(cameras),
     );
   }
 }
