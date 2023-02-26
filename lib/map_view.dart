@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:location/location.dart';
-
+import 'package:http/http.dart' as http;
 
 class MapView extends StatefulWidget {
   const MapView({Key? key}) : super(key: key);
@@ -22,6 +22,7 @@ class _MapViewState extends State<MapView> {
   void initState() {
     super.initState();
     getLocation();
+    findPlaces();
   }
 
   void _onMapCreated(GoogleMapController controller) {
@@ -81,5 +82,11 @@ class _MapViewState extends State<MapView> {
   void dispose() {
     mapController.dispose();
     super.dispose();
+  }
+
+  void findPlaces() async{
+    var url = Uri.https('maps.googleapis.com', 'maps/api/place/findplacefromtext/json', {'input': 'Recycle', 'inputtype':'textquery', 'key': 'API_KEY'});
+    var response = await http.post(url);
+    print('Response.body: ${response.body}');
   }
 }
