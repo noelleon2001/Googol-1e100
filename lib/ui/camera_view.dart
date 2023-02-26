@@ -139,9 +139,12 @@ class _CameraViewState extends State<CameraView> with WidgetsBindingObserver {
         ..totalElapsedTime = uiThreadInferenceElapsedTime);
 
       // set predicting to false to allow new frames
-      setState(() {
-        predicting = false;
-      });
+      if (mounted){
+        setState(() {
+          predicting = false;
+        });
+      }
+
     }
   }
 
