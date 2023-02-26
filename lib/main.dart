@@ -1,4 +1,5 @@
-import 'package:bin_brain/ui/home_view.dart';
+import '/ui/home_view.dart';
+import '/ui/map_view.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -47,10 +48,7 @@ class _NavigationBarWidgetState extends State<NavigationBarWidget> {
   static List<Widget> _widgetOptions = <Widget>[
     HomeView(),
     //Create the other widgets here
-    Text(
-      'Index 1: Map',
-      style: optionStyle,
-    ),
+    MapView(),
     Text(
       'Index 2: Game',
       style: optionStyle,
