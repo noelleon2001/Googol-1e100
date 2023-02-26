@@ -3,6 +3,7 @@ import 'package:camera/camera.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'firebase_options.dart';
 
+import 'map_view.dart';
 import 'object_detector_view.dart';
 
 List<CameraDescription> cameras = [];
@@ -51,10 +52,7 @@ class _NavigationBarWidgetState extends State<NavigationBarWidget> {
   static const List<Widget> _widgetOptions = <Widget>[
     ObjectDetectorView(),
     //Create the other widgets here
-    Text(
-      'Index 1: Map',
-      style: optionStyle,
-    ),
+    MapView(),
     Text(
       'Index 2: Game',
       style: optionStyle,

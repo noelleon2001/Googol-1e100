@@ -75,7 +75,7 @@ class _ObjectDetectorViewState extends State<ObjectDetectorView> {
 
     // uncomment next lines if you want to use a local model
     // make sure to add tflite model to assets/ml
-    final path = 'assets/ml/m1_metadata.tflite';
+    final path = 'assets/ml/adam_metadata.tflite';
     final modelPath = await _getModel(path);
     final options = LocalObjectDetectorOptions(
       mode: mode,
@@ -87,7 +87,7 @@ class _ObjectDetectorViewState extends State<ObjectDetectorView> {
 
     // uncomment next lines if you want to use a remote model
     // make sure to add model to firebase
-    // final modelName = 'waste-detector';
+    // final modelName = 'adam_metadata';
     // final response =
     //     await FirebaseObjectDetectorModelManager().downloadModel(modelName);
     // print('Downloaded: $response');
