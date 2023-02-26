@@ -75,7 +75,7 @@ class _ObjectDetectorViewState extends State<ObjectDetectorView> {
 
     // uncomment next lines if you want to use a local model
     // make sure to add tflite model to assets/ml
-    final path = 'assets/ml/yolov5n.tflite';
+    final path = 'assets/ml/m1_metadata.tflite';
     final modelPath = await _getModel(path);
     final options = LocalObjectDetectorOptions(
       mode: mode,
