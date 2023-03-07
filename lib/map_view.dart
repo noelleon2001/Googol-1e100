@@ -13,7 +13,7 @@ class MapView extends StatefulWidget {
 class _MapViewState extends State<MapView> {
   late GoogleMapController mapController;
 
-  LatLng? currentLatLng;
+  LatLng? currentLatLng = const LatLng(3.0639, 101.6007);
   Location location = Location();
   LocationData? _currentLocation;
 
@@ -21,8 +21,8 @@ class _MapViewState extends State<MapView> {
   @override
   void initState() {
     super.initState();
-    getLocation();
-    findPlaces();
+    // getLocation();
+    // findPlaces();
   }
 
   void _onMapCreated(GoogleMapController controller) {
