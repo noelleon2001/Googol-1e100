@@ -9,6 +9,7 @@ import 'package:http/http.dart' as http;
 import 'package:flutter_google_places/flutter_google_places.dart';
 import 'package:awesome_snackbar_content/awesome_snackbar_content.dart';
 import 'package:google_api_headers/google_api_headers.dart';
+import 'package:map_launcher/map_launcher.dart' as mpl;
 
 import './models.dart';
 
@@ -49,6 +50,15 @@ class _MapViewState extends State<MapView> {
     Scaffold(
       appBar: AppBar(
         title: Text('Map'),
+        actions: [
+          Padding(
+            padding: EdgeInsets.only(right: 20.0),
+            child: GestureDetector(
+              onTap: _mapOpen,
+              child: Icon(Icons.map_outlined),
+            ),
+          ),
+        ]
       ),
       key: homeScaffoldKey,
       body: SafeArea(
@@ -115,16 +125,28 @@ class _MapViewState extends State<MapView> {
     super.dispose();
   }
 
+  void _mapOpen() async{
+    var mapAvailable = await mpl.MapLauncher.isMapAvailable(mpl.MapType.google);
+
+    if (mapAvailable != null && mapAvailable == true) {
+      await mpl.MapLauncher.showMarker(
+        mapType: mpl.MapType.google,
+        coords: mpl.Coords(currentLatLng!.latitude, currentLatLng!.longitude),
+        title: 'Current Location'
+      );
+    }
+  }
 
   /*
   Sets markers
   * */
   void findPlaces() async{
     var url = Uri.https('maps.googleapis.com', 'maps/api/place/findplacefromtext/json',
-        {'input': 'recycle',
+        {'input': 'waste',
         'inputtype':'textquery',
           'key': dotenv.env['GMAP_KEY'],
-          'fields': 'formatted_address,geometry,name'});
+          'fields': 'formatted_address,geometry,name',
+          'locationBias': 'circle:5000@3.0639,101.600'});
     var response = await http.post(url);
 
     Set<Marker> markers = <Marker>{};
@@ -182,8 +204,6 @@ class _MapViewState extends State<MapView> {
         contentType: ContentType.failure,
       ),
     ));
-
-    // homeScaffoldKey.currentState!.showSnackBar(SnackBar(content: Text(response.errorMessage!)));
   }
 
   Future<void> displayPrediction(gs.Prediction p, ScaffoldState? currentState) async {
@@ -203,7 +223,6 @@ class _MapViewState extends State<MapView> {
     setState(() {});
 
     mapController.animateCamera(CameraUpdate.newLatLngZoom(LatLng(lat, lng), 14.0));
-
   }
 }
 
