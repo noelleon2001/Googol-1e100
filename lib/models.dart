@@ -12,7 +12,7 @@ class MapResponse{
   factory MapResponse.fromJSON(Map<String, dynamic> json){
 
     // candidates format: [{'formatted_address': '', ...}]
-    final placesData = json['candidates'] as List<dynamic>;
+    final placesData = json['results'] as List<dynamic>;
 
     final places = placesData
         .map((place) => Place.fromJson(place))
@@ -30,11 +30,13 @@ class Place{
   final String formattedAddress;
   final String name;
   final LatLng latLng;
+  // double? rating;
 
-  const Place({
+  Place({
     required this.formattedAddress,
     required this.name,
-    required this.latLng
+    required this.latLng,
+    // this.rating
   });
 
   factory Place.fromJson(Map<String, dynamic> json){
@@ -46,7 +48,8 @@ class Place{
     return Place(
       formattedAddress: json['formatted_address'],
       latLng: LatLng(lat!, lng!),
-      name: json['name']
+      name: json['name'],
+      // rating: json['rating']
     );
   }
 }

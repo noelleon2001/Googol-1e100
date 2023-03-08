@@ -10,6 +10,7 @@ import 'package:flutter_google_places/flutter_google_places.dart';
 import 'package:awesome_snackbar_content/awesome_snackbar_content.dart';
 import 'package:google_api_headers/google_api_headers.dart';
 import 'package:map_launcher/map_launcher.dart' as mpl;
+import 'dart:developer' as dev;
 
 import './models.dart';
 
@@ -66,7 +67,7 @@ class _MapViewState extends State<MapView> {
           onMapCreated: _onMapCreated,
           initialCameraPosition: CameraPosition(
             target: currentLatLng!,
-            zoom: 11.0,
+            zoom: 14.0,
           ),
           myLocationEnabled: true,
           zoomGesturesEnabled: true,
@@ -141,19 +142,18 @@ class _MapViewState extends State<MapView> {
   Sets markers
   * */
   void findPlaces() async{
-    var url = Uri.https('maps.googleapis.com', 'maps/api/place/findplacefromtext/json',
-        {'input': 'waste',
-        'inputtype':'textquery',
-          'key': dotenv.env['GMAP_KEY'],
-          'fields': 'formatted_address,geometry,name',
-          'locationBias': 'circle:5000@3.0639,101.600'});
+    var url = Uri.https('maps.googleapis.com', 'maps/api/place/textsearch/json',
+        {'query': 'waste',
+          'radius': '5000',
+          'location':'3.0639,101.600',
+          'key': dotenv.env['GMAP_KEY']});
     var response = await http.post(url);
 
     Set<Marker> markers = <Marker>{};
 
     if (response.statusCode == 200){
       MapResponse mapResponse = MapResponse.fromJSON(jsonDecode(response.body));
-      print('MapResponse: ${mapResponse.status}');
+      dev.log('MapResponse: ${mapResponse.status}');
 
       mapResponse.places.forEach((place) => {
         markers.add(Marker(
@@ -172,28 +172,32 @@ class _MapViewState extends State<MapView> {
   }
 
   Future<void> _handlePressButton() async {
-    gs.Prediction? p = await PlacesAutocomplete.show(
-        context: context,
-        apiKey: dotenv.env['GMAP_KEY']!,
-        onError: onError,
-        mode: _mode,
-        language: 'en',
-        strictbounds: false,
-        types: [""],
-        decoration: InputDecoration(
-            hintText: 'Search',
-            focusedBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(50.0),
-                borderSide: BorderSide(width: 3, style: BorderStyle.none))
-        ),
-        components: [gs.Component(gs.Component.country,"my")]);
 
 
-    displayPrediction(p!,homeScaffoldKey.currentState);
+      gs.Prediction? p = await PlacesAutocomplete.show(
+          context: context,
+          apiKey: dotenv.env['GMAP_KEY']!,
+          onError: onError,
+          mode: _mode,
+          language: 'en',
+          strictbounds: false,
+          types: [""],
+          decoration: InputDecoration(
+              hintText: 'Search',
+              focusedBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(50.0),
+                  borderSide: BorderSide(width: 3, style: BorderStyle.none))
+          ),
+          components: [gs.Component(gs.Component.country,"my")]);
+
+
+        if (p != null){
+          displayPrediction(p,homeScaffoldKey.currentState);
+        }
+
   }
 
   void onError(gs.PlacesAutocompleteResponse response){
-
     ScaffoldMessenger.of(context).showSnackBar(SnackBar(
       elevation: 0,
       behavior: SnackBarBehavior.floating,
