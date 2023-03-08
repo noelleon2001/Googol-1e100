@@ -17,6 +17,8 @@ import './models.dart';
 class MapView extends StatefulWidget {
   const MapView({Key? key}) : super(key: key);
 
+  static const List<String> markerOptions = ['Recycling Centres', 'Waste collectors'];
+
   @override
   State<MapView> createState() => _MapViewState();
 }
@@ -31,6 +33,7 @@ class _MapViewState extends State<MapView> {
   Location location = Location();
   LocationData? _currentLocation;
   final Mode _mode = Mode.overlay;
+  String dropDownValue = MapView.markerOptions.first;
 
   Set<Marker> markers = {};
 
@@ -63,16 +66,42 @@ class _MapViewState extends State<MapView> {
       ),
       key: homeScaffoldKey,
       body: SafeArea(
-        child: GoogleMap(
-          onMapCreated: _onMapCreated,
-          initialCameraPosition: CameraPosition(
-            target: currentLatLng!,
-            zoom: 14.0,
+        child: Stack(
+          children: [
+            GoogleMap(
+            onMapCreated: _onMapCreated,
+            initialCameraPosition: CameraPosition(
+              target: currentLatLng!,
+              zoom: 14.0,
+            ),
+            myLocationEnabled: true,
+            zoomGesturesEnabled: true,
+            markers:markers,
+            compassEnabled: false,
           ),
-          myLocationEnabled: true,
-          zoomGesturesEnabled: true,
-          markers:markers,
-          compassEnabled: false,
+           Padding(
+             padding: const EdgeInsets.all(8.0),
+             child: Container(
+               padding: EdgeInsets.all(5),
+               decoration: BoxDecoration(
+                 color: Colors.white,
+                 borderRadius: BorderRadius.circular(12)
+               ),
+               child: DropdownButton(
+                   value: dropDownValue,
+                   items: MapView.markerOptions.map<DropdownMenuItem<String>>((String value){
+                     return DropdownMenuItem(value: value, child: Text(value));
+                   }).toList(),
+                   elevation: 16,
+                   onChanged: (String? value){
+                     setState(() {
+                       dropDownValue = value!;
+                     });
+                   },
+               ),
+             ),
+           )
+          ]
         ),
       ),
       floatingActionButton: FloatingActionButton(
