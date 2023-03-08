@@ -41,7 +41,7 @@ class _MapViewState extends State<MapView> {
   void initState() {
     super.initState();
     getLocation();
-    findPlaces();
+    findPlaces(dropDownValue);
   }
 
   void _onMapCreated(GoogleMapController controller) {
@@ -69,16 +69,16 @@ class _MapViewState extends State<MapView> {
         child: Stack(
           children: [
             GoogleMap(
-            onMapCreated: _onMapCreated,
-            initialCameraPosition: CameraPosition(
-              target: currentLatLng!,
-              zoom: 14.0,
+              onMapCreated: _onMapCreated,
+              initialCameraPosition: CameraPosition(
+                target: currentLatLng!,
+                zoom: 14.0,
+              ),
+              myLocationEnabled: true,
+              zoomGesturesEnabled: true,
+              markers:markers,
+              compassEnabled: false,
             ),
-            myLocationEnabled: true,
-            zoomGesturesEnabled: true,
-            markers:markers,
-            compassEnabled: false,
-          ),
            Padding(
              padding: const EdgeInsets.all(8.0),
              child: Container(
@@ -97,6 +97,7 @@ class _MapViewState extends State<MapView> {
                      setState(() {
                        dropDownValue = value!;
                      });
+                     findPlaces(dropDownValue);
                    },
                ),
              ),
@@ -105,7 +106,7 @@ class _MapViewState extends State<MapView> {
         ),
       ),
       floatingActionButton: FloatingActionButton(
-        onPressed: _handlePressButton,
+        onPressed: _handleSearch,
         child: const Icon(Icons.search)
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.startFloat,
@@ -170,9 +171,9 @@ class _MapViewState extends State<MapView> {
   /*
   Sets markers
   * */
-  void findPlaces() async{
+  void findPlaces(String query) async{
     var url = Uri.https('maps.googleapis.com', 'maps/api/place/textsearch/json',
-        {'query': 'waste',
+        {'query': query,
           'radius': '5000',
           'location':'3.0639,101.600',
           'key': dotenv.env['GMAP_KEY']});
@@ -200,13 +201,11 @@ class _MapViewState extends State<MapView> {
     });
   }
 
-  Future<void> _handlePressButton() async {
-
-
+  Future<void> _handleSearch() async {
       gs.Prediction? p = await PlacesAutocomplete.show(
           context: context,
           apiKey: dotenv.env['GMAP_KEY']!,
-          onError: onError,
+          onError: onSearchError,
           mode: _mode,
           language: 'en',
           strictbounds: false,
@@ -221,12 +220,12 @@ class _MapViewState extends State<MapView> {
 
 
         if (p != null){
-          displayPrediction(p,homeScaffoldKey.currentState);
+          markSearchLocation(p,homeScaffoldKey.currentState);
         }
 
   }
 
-  void onError(gs.PlacesAutocompleteResponse response){
+  void onSearchError(gs.PlacesAutocompleteResponse response){
     ScaffoldMessenger.of(context).showSnackBar(SnackBar(
       elevation: 0,
       behavior: SnackBarBehavior.floating,
@@ -239,7 +238,7 @@ class _MapViewState extends State<MapView> {
     ));
   }
 
-  Future<void> displayPrediction(gs.Prediction p, ScaffoldState? currentState) async {
+  Future<void> markSearchLocation(gs.Prediction p, ScaffoldState? currentState) async {
     gs.GoogleMapsPlaces places = gs.GoogleMapsPlaces(
         apiKey: dotenv.env['GMAP_KEY'],
         apiHeaders: await const GoogleApiHeaders().getHeaders()
