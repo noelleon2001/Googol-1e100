@@ -3,8 +3,14 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:google_maps_webservice/places.dart' as gs;
 import 'package:location/location.dart';
 import 'package:http/http.dart' as http;
+import 'package:flutter_google_places/flutter_google_places.dart';
+import 'package:awesome_snackbar_content/awesome_snackbar_content.dart';
+import 'package:google_api_headers/google_api_headers.dart';
+
+import './models.dart';
 
 class MapView extends StatefulWidget {
   const MapView({Key? key}) : super(key: key);
@@ -13,15 +19,18 @@ class MapView extends StatefulWidget {
   State<MapView> createState() => _MapViewState();
 }
 
+final homeScaffoldKey = GlobalKey<ScaffoldState>();
+
+
 class _MapViewState extends State<MapView> {
   late GoogleMapController mapController;
 
   LatLng? currentLatLng;
   Location location = Location();
   LocationData? _currentLocation;
+  final Mode _mode = Mode.overlay;
 
   Set<Marker> markers = {};
-
 
   @override
   void initState() {
@@ -36,19 +45,34 @@ class _MapViewState extends State<MapView> {
 
   @override
   Widget build(BuildContext context) {
-    return currentLatLng == null ? Center(child: CircularProgressIndicator(),) : GoogleMap(
-      onMapCreated: _onMapCreated,
-      initialCameraPosition: CameraPosition(
-        target: currentLatLng!,
-        zoom: 11.0,
+    return currentLatLng == null ? Center(child: CircularProgressIndicator(),) :
+    Scaffold(
+      appBar: AppBar(
+        title: Text('Map'),
       ),
-      myLocationEnabled: true,
-      zoomGesturesEnabled: true,
-      markers:markers,
+      key: homeScaffoldKey,
+      body: SafeArea(
+        child: GoogleMap(
+          onMapCreated: _onMapCreated,
+          initialCameraPosition: CameraPosition(
+            target: currentLatLng!,
+            zoom: 11.0,
+          ),
+          myLocationEnabled: true,
+          zoomGesturesEnabled: true,
+          markers:markers,
+          compassEnabled: false,
+        ),
+      ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: _handlePressButton,
+        child: const Icon(Icons.search)
+      ),
+      floatingActionButtonLocation: FloatingActionButtonLocation.startFloat,
     );
   }
 
-
+  /*Called on init state*/
   getLocation() async{
     bool _serviceEnabled;
     PermissionStatus _permissionGranted;
@@ -93,7 +117,7 @@ class _MapViewState extends State<MapView> {
 
 
   /*
-  * api request -> json parse -> iterate -> place markers (use futurebuilder)
+  Sets markers
   * */
   void findPlaces() async{
     var url = Uri.https('maps.googleapis.com', 'maps/api/place/findplacefromtext/json',
@@ -124,56 +148,62 @@ class _MapViewState extends State<MapView> {
       this.markers = markers
     });
   }
-}
 
-class MapResponse{
-  final List<Place> places;
-  final String status;
+  Future<void> _handlePressButton() async {
+    gs.Prediction? p = await PlacesAutocomplete.show(
+        context: context,
+        apiKey: dotenv.env['GMAP_KEY']!,
+        onError: onError,
+        mode: _mode,
+        language: 'en',
+        strictbounds: false,
+        types: [""],
+        decoration: InputDecoration(
+            hintText: 'Search',
+            focusedBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(50.0),
+                borderSide: BorderSide(width: 3, style: BorderStyle.none))
+        ),
+        components: [gs.Component(gs.Component.country,"my")]);
 
-  const MapResponse({
-    required this.places,
-    required this.status
-  });
 
-  factory MapResponse.fromJSON(Map<String, dynamic> json){
+    displayPrediction(p!,homeScaffoldKey.currentState);
+  }
 
-    // candidates format: [{'formatted_address': '', ...}]
-    final placesData = json['candidates'] as List<dynamic>;
+  void onError(gs.PlacesAutocompleteResponse response){
 
-    final places = placesData
-        .map((place) => Place.fromJson(place))
-        .toList();
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+      elevation: 0,
+      behavior: SnackBarBehavior.floating,
+      backgroundColor: Colors.transparent,
+      content: AwesomeSnackbarContent(
+        title: 'Message',
+        message: response.errorMessage!,
+        contentType: ContentType.failure,
+      ),
+    ));
 
-    return MapResponse(
-        places: places,
-        status: json['status'] as String
+    // homeScaffoldKey.currentState!.showSnackBar(SnackBar(content: Text(response.errorMessage!)));
+  }
+
+  Future<void> displayPrediction(gs.Prediction p, ScaffoldState? currentState) async {
+    gs.GoogleMapsPlaces places = gs.GoogleMapsPlaces(
+        apiKey: dotenv.env['GMAP_KEY'],
+        apiHeaders: await const GoogleApiHeaders().getHeaders()
     );
+
+    gs.PlacesDetailsResponse detail = await places.getDetailsByPlaceId(p.placeId!);
+
+    final lat = detail.result.geometry!.location.lat;
+    final lng = detail.result.geometry!.location.lng;
+
+    markers.clear();
+    markers.add(Marker(markerId: const MarkerId("0"),position: LatLng(lat, lng),infoWindow: InfoWindow(title: detail.result.name)));
+
+    setState(() {});
+
+    mapController.animateCamera(CameraUpdate.newLatLngZoom(LatLng(lat, lng), 14.0));
+
   }
 }
 
-
-class Place{
-  final String formattedAddress;
-  final String name;
-  // final String location;
-  final LatLng latLng;
-
-  const Place({
-    required this.formattedAddress,
-    required this.name,
-    required this.latLng
-  });
-
-  factory Place.fromJson(Map<String, dynamic> json){
-    print(json);
-     var location = json['geometry']['location'] as Map<String, dynamic>,
-         lat = location['lat'],
-         lng = location['lng'];
-
-    return Place(
-      formattedAddress: json['formatted_address'],
-      latLng: LatLng(lat!, lng!),
-      name: json['name']
-    );
-  }
-}
