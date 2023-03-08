@@ -52,6 +52,7 @@ dependencies:
   google_api_headers: ^1.5.0+1
   awesome_snackbar_content: ^0.1.2
   map_launcher: ^2.5.0+1
+  settings_ui: ^2.0.2
 
 dev_dependencies:
   flutter_test:

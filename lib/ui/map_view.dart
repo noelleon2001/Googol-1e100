@@ -12,7 +12,7 @@ import 'package:google_api_headers/google_api_headers.dart';
 import 'package:map_launcher/map_launcher.dart' as mpl;
 import 'dart:developer' as dev;
 
-import './models.dart';
+import '../models.dart';
 
 class MapView extends StatefulWidget {
   const MapView({Key? key}) : super(key: key);

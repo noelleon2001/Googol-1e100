@@ -4,8 +4,9 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'firebase_options.dart';
 
-import 'map_view.dart';
-import 'object_detector_view.dart';
+import 'ui/map_view.dart';
+import 'ui/object_detector_view.dart';
+import 'ui/settings.dart';
 
 List<CameraDescription> cameras = [];
 
@@ -59,10 +60,7 @@ class _NavigationBarWidgetState extends State<NavigationBarWidget> {
       'Index 2: Game',
       style: optionStyle,
     ),
-    Text(
-      'Index 3: Settings',
-      style: optionStyle,
-    ),
+    SettingsView()
   ];
 
   void _onItemTapped(int index) {
