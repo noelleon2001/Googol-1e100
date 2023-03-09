@@ -23,6 +23,7 @@ Future<void> main() async {
   await dotenv.load(fileName: ".env");
   final modelName = 'adam_metadata';
   final response = await FirebaseObjectDetectorModelManager().downloadModel(modelName);
+  print("Downloaded: $response");
   runApp(const MyApp());
 }
 

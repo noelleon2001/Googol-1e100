@@ -40,9 +40,9 @@ class GameViewState extends State<GameView> {
       enableAudio: false,
     );
 
-
     // Next, initialize the controller. This returns a Future.
     _initializeControllerFuture = _controller.initialize();
+    _controller.setFlashMode(FlashMode.off);
   }
 
   @override
