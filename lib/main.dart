@@ -27,6 +27,7 @@ Future<void> main() async {
 
   const modelName = 'adam_metadata';
   final response = await FirebaseObjectDetectorModelManager().downloadModel(modelName);
+  print("Downloaded: $response");
   runApp(const MyApp());
 }
 
