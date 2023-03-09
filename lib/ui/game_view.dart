@@ -199,7 +199,7 @@ class DisplayPictureScreenState extends State<DisplayPictureScreen> {
       final storage = Storage(client, 'googol-1e100');
 
       // Generate random file name
-      final fileName = '/data/$fileLocation/${DateTime.now().millisecondsSinceEpoch}-${path.basename(widget.imagePath)}';
+      final fileName = 'dataset/$fileLocation/${DateTime.now().millisecondsSinceEpoch}-${path.basename(widget.imagePath)}';
 
       // Open image file and upload to GCS
       final imageFile = File(widget.imagePath);
