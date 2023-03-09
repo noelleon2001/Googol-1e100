@@ -34,12 +34,11 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
-      home:  const NavigationBarWidget(),
+      home: const NavigationBarWidget(),
       debugShowCheckedModeBanner: false,
     );
   }
 }
-
 
 class NavigationBarWidget extends StatefulWidget {
   const NavigationBarWidget({Key? key}) : super(key: key);
@@ -50,8 +49,10 @@ class NavigationBarWidget extends StatefulWidget {
 
 class _NavigationBarWidgetState extends State<NavigationBarWidget> {
   int _selectedIndex = 0;
+  bool _switch = false;
 
-  static const TextStyle optionStyle = TextStyle(fontSize: 30, fontWeight: FontWeight.bold);
+  static const TextStyle optionStyle =
+      TextStyle(fontSize: 30, fontWeight: FontWeight.bold);
 
   static const List<Widget> _widgetOptions = <Widget>[
     ObjectDetectorView(),
@@ -60,9 +61,14 @@ class _NavigationBarWidgetState extends State<NavigationBarWidget> {
     SettingsView()
   ];
 
-  void _onItemTapped(int index) {
+  void _onItemTapped(int index) async {
     setState(() {
       _selectedIndex = index;
+      _switch = true;
+    });
+    await Future.delayed(Duration(milliseconds: 500));
+    setState(() {
+      _switch = false;
     });
   }
 
@@ -70,7 +76,9 @@ class _NavigationBarWidgetState extends State<NavigationBarWidget> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: Center(
-        child: _widgetOptions.elementAt(_selectedIndex),
+        child: _switch == true
+            ? CircularProgressIndicator()
+            : _widgetOptions.elementAt(_selectedIndex),
       ),
       bottomNavigationBar: BottomNavigationBar(
         items: const <BottomNavigationBarItem>[
@@ -99,4 +107,3 @@ class _NavigationBarWidgetState extends State<NavigationBarWidget> {
     );
   }
 }
-

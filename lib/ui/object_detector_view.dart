@@ -22,6 +22,7 @@ class _ObjectDetectorViewState extends State<ObjectDetectorView> {
   bool _isBusy = false;
   CustomPaint? _customPaint;
   String? _text;
+  bool _downloading = false;
 
   @override
   void initState() {
@@ -39,16 +40,33 @@ class _ObjectDetectorViewState extends State<ObjectDetectorView> {
 
   @override
   Widget build(BuildContext context) {
-    return CameraView(
-      title: 'Object Detector',
-      customPaint: _customPaint,
-      text: _text,
-      onImage: (inputImage) {
-        processImage(inputImage);
-      },
-      onScreenModeChanged: _onScreenModeChanged,
-      initialDirection: CameraLensDirection.back,
-    );
+    return _downloading == true
+        ? Scaffold(
+            body: Padding(
+              padding: const EdgeInsets.all(20.0),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: <Widget>[
+                  Text(
+                    'Downloading object detection model from Firebase',
+                    style: Theme.of(context).textTheme.titleLarge,
+                    textAlign: TextAlign.center,
+                  ),
+                  CircularProgressIndicator(),
+                ],
+              ),
+            ),
+          )
+        : CameraView(
+            title: 'Object Detector',
+            customPaint: _customPaint,
+            text: _text,
+            onImage: (inputImage) {
+              processImage(inputImage);
+            },
+            onScreenModeChanged: _onScreenModeChanged,
+            initialDirection: CameraLensDirection.back,
+          );
   }
 
   void _onScreenModeChanged(ScreenMode mode) {
@@ -65,43 +83,44 @@ class _ObjectDetectorViewState extends State<ObjectDetectorView> {
 
   void _initializeDetector(DetectionMode mode) async {
     print('Set detector in mode: $mode');
-
     // uncomment next lines if you want to use the default model
     // final options = ObjectDetectorOptions(
     //     mode: mode,
     //     classifyObjects: true,
     //     multipleObjects: true);
     // _objectDetector = ObjectDetector(options: options);
-
     // uncomment next lines if you want to use a local model
     // make sure to add tflite model to assets/ml
-    final path = 'assets/ml/adam_metadata.tflite';
-    final modelPath = await _getModel(path);
-    final options = LocalObjectDetectorOptions(
-      mode: mode,
-      modelPath: modelPath,
-      classifyObjects: true,
-      multipleObjects: true,
-    );
-    _objectDetector = ObjectDetector(options: options);
-
-    // uncomment next lines if you want to use a remote model
-    // make sure to add model to firebase
-    // final modelName = 'adam_metadata';
-    // final response =
-    //     await FirebaseObjectDetectorModelManager().downloadModel(modelName);
-    // print('Downloaded: $response');
-    // final options = FirebaseObjectDetectorOptions(
+    // final path = 'assets/6class/effi.tflite';
+    // final modelPath = await _getModel(path);
+    // final options = LocalObjectDetectorOptions(
     //   mode: mode,
-    //   modelName: modelName,
+    //   modelPath: modelPath,
     //   classifyObjects: true,
     //   multipleObjects: true,
     // );
     // _objectDetector = ObjectDetector(options: options);
-
+    // uncomment next lines if you want to use a remote model
+    // make sure to add model to firebase
+    setState(() {
+      _downloading = true;
+    });
+    final modelName = 'adam_metadata';
+    final response =
+    await FirebaseObjectDetectorModelManager().downloadModel(modelName);
+    print('Downloaded: $response');
+    setState(() {
+      _downloading = false;
+    });
+    final options = FirebaseObjectDetectorOptions(
+      mode: mode,
+      modelName: modelName,
+      classifyObjects: true,
+      multipleObjects: true,
+    );
+    _objectDetector = ObjectDetector(options: options);
     _canProcess = true;
   }
-
   Future<void> processImage(InputImage inputImage) async {
     if (!_canProcess) return;
     if (_isBusy) return;
@@ -121,7 +140,7 @@ class _ObjectDetectorViewState extends State<ObjectDetectorView> {
       String text = 'Objects found: ${objects.length}\n\n';
       for (final object in objects) {
         text +=
-        'Object:  trackingId: ${object.trackingId} - ${object.labels.map((e) => e.text)}\n\n';
+            'Object:  trackingId: ${object.trackingId} - ${object.labels.map((e) => e.text)}\n\n';
       }
       _text = text;
       // TODO: set _customPaint to draw boundingRect on top of image
