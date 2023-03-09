@@ -122,7 +122,40 @@ class DisplayPictureScreenState extends State<DisplayPictureScreen> {
   // DisplayPictureScreen({super.key, required this.imagePath});
   bool loading = false;
 
-  void stuff() async{
+  Widget upload_dialog(BuildContext context, String _option) {
+    return AlertDialog(
+      title: const Text('Upload image to...'),
+      content: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: <Widget>[
+          Text('$_option'),
+        ],
+      ),
+      actions: <Widget>[
+        ElevatedButton(
+          style: ElevatedButton.styleFrom(
+            primary: Colors.red, // Background color
+            onPrimary: Colors.black, // Text Color (Foreground color)
+          ),
+          onPressed: () {
+            Navigator.of(context).pop();
+          },
+          child: const Text('Cancel'),
+        ),
+        ElevatedButton(
+          onPressed: () {
+            Navigator.of(context).pop();
+            upload(_option);
+          },
+          child: const Text('Confirm'),
+        ),
+      ],
+      actionsAlignment: MainAxisAlignment.spaceBetween,
+    );
+  }
+
+  void _success() async{
     if (loading) {
       Center(
         child: CircularProgressIndicator(),
@@ -131,9 +164,25 @@ class DisplayPictureScreenState extends State<DisplayPictureScreen> {
     // pop up
     await showDialog(
       context: context,
-      builder: (BuildContext context) => _buildPopupDialog(context),
+      builder: (BuildContext context) => _buildPopupDialog(context, true),
     );
 
+    Navigator.of(context).pop();
+  }
+
+  void _failure() async{
+    if (loading) {
+      Center(
+        child: CircularProgressIndicator(),
+      );
+    }
+    // pop up
+    await showDialog(
+      context: context,
+      builder: (BuildContext context) => _buildPopupDialog(context, false),
+    );
+
+    // pop display image screen
     Navigator.of(context).pop();
   }
 
@@ -143,32 +192,42 @@ class DisplayPictureScreenState extends State<DisplayPictureScreen> {
     });
 
     // Set up Google Cloud Storage
-    final _json = await loadAsset();
-    final credentials = await auth.ServiceAccountCredentials.fromJson(_json);
-    final client = await auth.clientViaServiceAccount(credentials, Storage.SCOPES);
-    final storage = Storage(client, 'googol-1e100');
+    try {
+      final _json = await loadAsset();
+      final credentials = await auth.ServiceAccountCredentials.fromJson(_json);
+      final client = await auth.clientViaServiceAccount(credentials, Storage.SCOPES);
+      final storage = Storage(client, 'googol-1e100');
 
-    // Generate random file name
-    final fileName = '$fileLocation/${DateTime.now().millisecondsSinceEpoch}-${path.basename(widget.imagePath)}';
+      // Generate random file name
+      final fileName = '/data/$fileLocation/${DateTime.now().millisecondsSinceEpoch}-${path.basename(widget.imagePath)}';
 
-    // Open image file and upload to GCS
-    final imageFile = File(widget.imagePath);
-    final bucket = storage.bucket('googol-1e100.appspot.com');
-    final imageBytes = imageFile.readAsBytesSync();
-    final type = lookupMimeType(fileName);
-    final timestamp = DateTime.now().millisecondsSinceEpoch;
-    await bucket.writeBytes(fileName, imageBytes,
-        metadata: ObjectMetadata(
-          contentType: type,
-          custom: {
-            'timestamp': '$timestamp',
-          },
-        ));
-    print("Uploaded");
+      // Open image file and upload to GCS
+      final imageFile = File(widget.imagePath);
+      final bucket = storage.bucket('googol-1e100.appspot.com');
+      final imageBytes = imageFile.readAsBytesSync();
+      final type = lookupMimeType(fileName);
+      final timestamp = DateTime.now().millisecondsSinceEpoch;
 
-    setState(() {
-      loading = false;
-    });
+      await bucket.writeBytes(fileName, imageBytes,
+          metadata: ObjectMetadata(
+            contentType: type,
+            custom: {
+              'timestamp': '$timestamp',
+            },
+          ));
+
+      setState(() {
+        loading = false;
+      });
+
+      _success();
+    } catch(e){
+      setState(() {
+        loading = false;
+      });
+
+      _failure();
+    }
   }
 
   @override
@@ -181,9 +240,9 @@ class DisplayPictureScreenState extends State<DisplayPictureScreen> {
       floatingActionButton: SpeedDial( //Speed dial menu
         icon: Icons.menu, //icon on Floating action button
         activeIcon: Icons.close, //icon when menu is expanded on button
-        backgroundColor: Colors.deepOrangeAccent, //background color of button
+        backgroundColor: Colors.blue, //background color of button
         foregroundColor: Colors.white, //font color, icon color in button
-        activeBackgroundColor: Colors.deepPurpleAccent, //background color when menu is expanded
+        activeBackgroundColor: Colors.blue, //background color when menu is expanded
         activeForegroundColor: Colors.white,
         visible: true,
         closeManually: false,
@@ -204,8 +263,10 @@ class DisplayPictureScreenState extends State<DisplayPictureScreen> {
             label: 'Plastic',
             labelStyle: TextStyle(fontSize: 18.0),
             onTap: () async {
-              upload('dataset/plastic');
-              stuff();
+              await showDialog(
+                context: context,
+                builder: (BuildContext context) => upload_dialog(context, 'plastic'),
+              );
             },
           ),
           SpeedDialChild(
@@ -215,8 +276,10 @@ class DisplayPictureScreenState extends State<DisplayPictureScreen> {
             label: 'Metal',
             labelStyle: TextStyle(fontSize: 18.0),
             onTap: () async {
-              upload('dataset/metal');
-              stuff();
+              await showDialog(
+                context: context,
+                builder: (BuildContext context) => upload_dialog(context, 'metal'),
+              );
             },
           ),
           SpeedDialChild(
@@ -226,8 +289,10 @@ class DisplayPictureScreenState extends State<DisplayPictureScreen> {
             label: 'Cardboard',
             labelStyle: TextStyle(fontSize: 18.0),
             onTap: () async {
-              upload('dataset/cardboard');
-              stuff();
+              await showDialog(
+                context: context,
+                builder: (BuildContext context) => upload_dialog(context, 'cardboard'),
+              );
             },
           ),
           SpeedDialChild(
@@ -237,8 +302,10 @@ class DisplayPictureScreenState extends State<DisplayPictureScreen> {
             label: 'Paper',
             labelStyle: TextStyle(fontSize: 18.0),
             onTap: () async {
-              upload('dataset/paper');
-              stuff();
+              await showDialog(
+                context: context,
+                builder: (BuildContext context) => upload_dialog(context, 'paper'),
+              );
             },
           ),
           SpeedDialChild(
@@ -248,8 +315,10 @@ class DisplayPictureScreenState extends State<DisplayPictureScreen> {
             label: 'Glass',
             labelStyle: TextStyle(fontSize: 18.0),
             onTap: () async {
-              upload('dataset/glass');
-              stuff();
+              await showDialog(
+                context: context,
+                builder: (BuildContext context) => upload_dialog(context, 'glass'),
+              );
             },
           ),
           SpeedDialChild(
@@ -259,8 +328,10 @@ class DisplayPictureScreenState extends State<DisplayPictureScreen> {
             label: 'Trash',
             labelStyle: TextStyle(fontSize: 18.0),
             onTap: () async {
-              upload('dataset/trash');
-              stuff();
+              await showDialog(
+                context: context,
+                builder: (BuildContext context) => upload_dialog(context, 'trash'),
+              );
             },
           ),
 
@@ -294,28 +365,25 @@ class DisplayPictureScreenState extends State<DisplayPictureScreen> {
   }
 }
 
-Widget _buildPopupDialog(BuildContext context) {
+Widget _buildPopupDialog(BuildContext context, bool _status) {
   return AlertDialog(
     title: const Text('Notification:'),
     content: Column(
       mainAxisSize: MainAxisSize.min,
       crossAxisAlignment: CrossAxisAlignment.start,
       children: <Widget>[
-        Text("Upload Success"),
+        _status ? Text("Upload Success", style: TextStyle(decoration: TextDecoration.none,color: Colors.black,),)
+            : Text("Upload Fail!\n(Bad internet connection)", style: TextStyle(fontWeight: FontWeight.bold,color: Colors.red,),),
       ],
     ),
     actions: <Widget>[
       ElevatedButton(
         onPressed: () {
           Navigator.of(context).pop();
-          // Navigator.of(context).push(
-          //   MaterialPageRoute(
-          //     builder: (context) => TakePictureScreen(),
-          //   ),
-          // );
         },
         child: const Text('Close'),
       ),
     ],
   );
 }
+

@@ -3,6 +3,7 @@ import 'package:camera/camera.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'firebase_options.dart';
+import 'package:google_mlkit_object_detection/google_mlkit_object_detection.dart';
 
 import 'ui/map_view.dart';
 import 'ui/object_detector_view.dart';
@@ -20,6 +21,8 @@ Future<void> main() async {
 
   cameras = await availableCameras();
   await dotenv.load(fileName: ".env");
+  final modelName = 'adam_metadata';
+  final response = await FirebaseObjectDetectorModelManager().downloadModel(modelName);
   runApp(const MyApp());
 }
 
@@ -34,11 +37,12 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
-      home: const NavigationBarWidget(),
+      home:  const NavigationBarWidget(),
       debugShowCheckedModeBanner: false,
     );
   }
 }
+
 
 class NavigationBarWidget extends StatefulWidget {
   const NavigationBarWidget({Key? key}) : super(key: key);
@@ -51,8 +55,7 @@ class _NavigationBarWidgetState extends State<NavigationBarWidget> {
   int _selectedIndex = 0;
   bool _switch = false;
 
-  static const TextStyle optionStyle =
-      TextStyle(fontSize: 30, fontWeight: FontWeight.bold);
+  static const TextStyle optionStyle = TextStyle(fontSize: 30, fontWeight: FontWeight.bold);
 
   static const List<Widget> _widgetOptions = <Widget>[
     ObjectDetectorView(),
@@ -76,9 +79,7 @@ class _NavigationBarWidgetState extends State<NavigationBarWidget> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: Center(
-        child: _switch == true
-            ? CircularProgressIndicator()
-            : _widgetOptions.elementAt(_selectedIndex),
+        child: _switch == true ? CircularProgressIndicator() : _widgetOptions.elementAt(_selectedIndex),
       ),
       bottomNavigationBar: BottomNavigationBar(
         items: const <BottomNavigationBarItem>[
@@ -107,3 +108,4 @@ class _NavigationBarWidgetState extends State<NavigationBarWidget> {
     );
   }
 }
+
