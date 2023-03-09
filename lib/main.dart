@@ -7,10 +7,9 @@ import 'firebase_options.dart';
 import 'package:google_mlkit_object_detection/google_mlkit_object_detection.dart';
 import 'package:persistent_bottom_nav_bar/persistent_tab_view.dart';
 
-
 import 'ui/map_view.dart';
 import 'ui/object_detector_view.dart';
-import 'ui/settings.dart';
+import 'ui/about.dart';
 import 'ui/game_view.dart';
 
 List<CameraDescription> cameras = [];
@@ -26,7 +25,8 @@ Future<void> main() async {
   await dotenv.load(fileName: ".env");
 
   const modelName = 'adam_metadata';
-  final response = await FirebaseObjectDetectorModelManager().downloadModel(modelName);
+  final response =
+      await FirebaseObjectDetectorModelManager().downloadModel(modelName);
   print("Downloaded: $response");
   runApp(const MyApp());
 }
@@ -42,12 +42,11 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
-      home:  const NavigationBarWidget(),
+      home: const NavigationBarWidget(),
       debugShowCheckedModeBanner: false,
     );
   }
 }
-
 
 class NavigationBarWidget extends StatefulWidget {
   const NavigationBarWidget({Key? key}) : super(key: key);
@@ -57,7 +56,6 @@ class NavigationBarWidget extends StatefulWidget {
 }
 
 class _NavigationBarWidgetState extends State<NavigationBarWidget> {
-  int _selectedIndex = 0;
   bool _switch = false;
 
   late PersistentTabController _controller;
@@ -68,16 +66,46 @@ class _NavigationBarWidgetState extends State<NavigationBarWidget> {
     _controller = PersistentTabController(initialIndex: 0);
   }
 
-  static const List<Widget> _widgetOptions = <Widget>[
-    ObjectDetectorView(),
-    MapView(),
-    GameView(),
-    SettingsView()
-  ];
+  @override
+  Widget build(BuildContext context) {
+    return _switch ? const Scaffold(body: Center(child: CircularProgressIndicator())) : PersistentTabView(
+      context,
+      controller: _controller,
+      screens: _buildScreens(),
+      items: _navBarsItems(),
+      confineInSafeArea: true,
+      backgroundColor: Colors.white, // Default is Colors.white.
+      resizeToAvoidBottomInset: true,
+      hideNavigationBarWhenKeyboardShows:
+      true, // Recommended to set 'resizeToAvoidBottomInset' as true while using this argument. Default is true.
+      decoration: NavBarDecoration(
+        borderRadius: BorderRadius.circular(10.0),
+        colorBehindNavBar: Colors.white,
+      ),
+      popAllScreensOnTapOfSelectedTab: true,
+      popActionScreens: PopActionScreensType.all,
+      itemAnimationProperties: const ItemAnimationProperties(
+        // Navigation Bar's items animation properties.
+        duration: Duration(milliseconds: 200),
+        curve: Curves.ease,
+      ),
+      screenTransitionAnimation: const ScreenTransitionAnimation(
+        // Screen transition animation on change of selected tab.
+        animateTabTransition: true,
+        curve: Curves.ease,
+        duration: Duration(milliseconds: 200),
+      ),
+      navBarStyle: NavBarStyle.style1,
+      onItemSelected: _onItemTapped,
+
+      // Choose the nav bar style with this property.
+    );
+
+
+  }
 
   void _onItemTapped(int index) async {
     setState(() {
-      _selectedIndex = index;
       _switch = true;
     });
     await Future.delayed(const Duration(milliseconds: 500));
@@ -87,13 +115,13 @@ class _NavigationBarWidgetState extends State<NavigationBarWidget> {
   }
 
   List<Widget> _buildScreens() {
-    return [
-      const ObjectDetectorView(),
-      const MapView(),
-      const GameView(),
-      const SettingsView()
-    ];
-  }
+      return [
+        const ObjectDetectorView(),
+        const MapView(),
+        const GameView(),
+        const AboutView()
+      ];
+    }
 
   List<PersistentBottomNavBarItem> _navBarsItems() {
     return [
@@ -101,7 +129,7 @@ class _NavigationBarWidgetState extends State<NavigationBarWidget> {
         icon: const Icon(Icons.home),
         title: ("Home"),
         activeColorPrimary: Colors.blue,
-        inactiveColorPrimary:Colors.grey,
+        inactiveColorPrimary: Colors.grey,
       ),
       PersistentBottomNavBarItem(
         icon: const Icon(Icons.map),
@@ -116,8 +144,8 @@ class _NavigationBarWidgetState extends State<NavigationBarWidget> {
         inactiveColorPrimary: CupertinoColors.systemGrey,
       ),
       PersistentBottomNavBarItem(
-        icon: const Icon(Icons.settings),
-        title: ("Settings"),
+        icon: const Icon(Icons.info),
+        title: ("Info"),
         activeColorPrimary: Colors.grey,
         inactiveColorPrimary: CupertinoColors.systemGrey,
       ),
@@ -125,68 +153,4 @@ class _NavigationBarWidgetState extends State<NavigationBarWidget> {
   }
 
 
-  @override
-  Widget build(BuildContext context) {
-    return PersistentTabView(
-      context,
-      controller: _controller,
-      screens: _buildScreens(),
-      items: _navBarsItems(),
-      confineInSafeArea: true,
-      backgroundColor: Colors.white, // Default is Colors.white.
-      handleAndroidBackButtonPress: true, // Default is true.
-      resizeToAvoidBottomInset: true, // This needs to be true if you want to move up the screen when keyboard appears. Default is true.
-      stateManagement: true, // Default is true.
-      hideNavigationBarWhenKeyboardShows: true, // Recommended to set 'resizeToAvoidBottomInset' as true while using this argument. Default is true.
-      decoration: NavBarDecoration(
-        borderRadius: BorderRadius.circular(10.0),
-        colorBehindNavBar: Colors.white,
-      ),
-      popAllScreensOnTapOfSelectedTab: true,
-      popActionScreens: PopActionScreensType.all,
-      itemAnimationProperties: ItemAnimationProperties( // Navigation Bar's items animation properties.
-        duration: Duration(milliseconds: 200),
-        curve: Curves.ease,
-      ),
-      screenTransitionAnimation: ScreenTransitionAnimation( // Screen transition animation on change of selected tab.
-        animateTabTransition: true,
-        curve: Curves.ease,
-        duration: Duration(milliseconds: 200),
-      ),
-      navBarStyle: NavBarStyle.style1,
-      // Choose the nav bar style with this property.
-    );
-
-
-    // return Scaffold(
-    //   body: Center(
-    //     child: _switch == true ? const CircularProgressIndicator() : _widgetOptions.elementAt(_selectedIndex),
-    //   ),
-    //   bottomNavigationBar: BottomNavigationBar(
-    //     items: const <BottomNavigationBarItem>[
-    //       BottomNavigationBarItem(
-    //         icon: Icon(Icons.home),
-    //         label: 'Home',
-    //       ),
-    //       BottomNavigationBarItem(
-    //         icon: Icon(Icons.map),
-    //         label: 'Map',
-    //       ),
-    //       BottomNavigationBarItem(
-    //         icon: Icon(Icons.add_a_photo),
-    //         label: 'Game',
-    //       ),
-    //       BottomNavigationBarItem(
-    //         icon: Icon(Icons.settings),
-    //         label: 'Settings',
-    //       ),
-    //     ],
-    //     currentIndex: _selectedIndex,
-    //     selectedItemColor: Colors.blue[800],
-    //     unselectedItemColor: Colors.grey[800],
-    //     onTap: _onItemTapped,
-    //   ),
-    // );
-  }
 }
-

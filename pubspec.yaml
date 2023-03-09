@@ -55,9 +55,9 @@ dependencies:
   google_api_headers: ^1.5.0+1
   awesome_snackbar_content: ^0.1.2
   map_launcher: ^2.5.0+1
-  settings_ui: ^2.0.2
   flutter_speed_dial: ^6.2.0
   persistent_bottom_nav_bar: ^5.0.2
+  flutter_about_page: ^0.0.1
 
 dev_dependencies:
   flutter_test:
@@ -69,6 +69,11 @@ dev_dependencies:
   # package. See that file for information about deactivating specific lint
   # rules and activating additional ones.
   flutter_lints: ^2.0.0
+  flutter_native_splash:
+
+flutter_native_splash:
+  image: assets/logo.png
+  color: "#ffffff"
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
