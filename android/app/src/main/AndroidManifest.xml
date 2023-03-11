@@ -1,7 +1,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.example.bin_brain">
    <application
-        android:label="bin_brain"
+        android:label="BinBrain"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
         <activity
@@ -30,5 +30,8 @@
         <meta-data
             android:name="flutterEmbedding"
             android:value="2" />
+
+       <meta-data android:name="com.google.android.geo.API_KEY"
+           android:value="AIzaSyD7BAG-TbQG5SnqFalW6OiVBnOgHcgR2bA"/>
     </application>
 </manifest>
