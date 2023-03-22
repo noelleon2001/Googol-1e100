@@ -86,6 +86,7 @@ class _CameraViewState extends State<CameraView> {
     return Scaffold(
       appBar: AppBar(
         title: Text(widget.title),
+        leading: BackButton(color: Colors.white),
         actions: [
           if (_allowPicker)
             Padding(

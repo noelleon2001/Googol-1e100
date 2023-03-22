@@ -7,6 +7,8 @@ import 'firebase_options.dart';
 import 'package:google_mlkit_object_detection/google_mlkit_object_detection.dart';
 import 'package:persistent_bottom_nav_bar/persistent_tab_view.dart';
 
+import 'package:google_fonts/google_fonts.dart';
+
 import 'ui/map_view.dart';
 import 'ui/object_detector_view.dart';
 import 'ui/about.dart';
@@ -40,7 +42,11 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'BinBrain',
       theme: ThemeData(
-        primarySwatch: Colors.blue,
+        colorScheme: ColorScheme.fromSwatch().copyWith(
+          primary: const Color(0xFF58D5D3),
+          secondary: const Color(0xFF58D5D3)
+        ), 
+        textTheme: GoogleFonts.interTextTheme(Theme.of(context).textTheme),
       ),
       home: const NavigationBarWidget(),
       debugShowCheckedModeBanner: false,
@@ -74,14 +80,10 @@ class _NavigationBarWidgetState extends State<NavigationBarWidget> {
       screens: _buildScreens(),
       items: _navBarsItems(),
       confineInSafeArea: true,
-      backgroundColor: Colors.white, // Default is Colors.white.
+      backgroundColor: const Color(0xFF58D5D3),// Default is Colors.white.
       resizeToAvoidBottomInset: true,
       hideNavigationBarWhenKeyboardShows:
       true, // Recommended to set 'resizeToAvoidBottomInset' as true while using this argument. Default is true.
-      decoration: NavBarDecoration(
-        borderRadius: BorderRadius.circular(10.0),
-        colorBehindNavBar: Colors.white,
-      ),
       popAllScreensOnTapOfSelectedTab: true,
       popActionScreens: PopActionScreensType.all,
       itemAnimationProperties: const ItemAnimationProperties(
@@ -95,20 +97,18 @@ class _NavigationBarWidgetState extends State<NavigationBarWidget> {
         curve: Curves.ease,
         duration: Duration(milliseconds: 200),
       ),
-      navBarStyle: NavBarStyle.style1,
+      navBarStyle: NavBarStyle.style14,
       onItemSelected: _onItemTapped,
 
       // Choose the nav bar style with this property.
     );
-
-
   }
 
   void _onItemTapped(int index) async {
     setState(() {
       _switch = true;
     });
-    await Future.delayed(const Duration(milliseconds: 500));
+    // await Future.delayed(const Duration(milliseconds: 500));
     setState(() {
       _switch = false;
     });
@@ -127,27 +127,23 @@ class _NavigationBarWidgetState extends State<NavigationBarWidget> {
     return [
       PersistentBottomNavBarItem(
         icon: const Icon(Icons.home),
-        title: ("Home"),
-        activeColorPrimary: Colors.blue,
-        inactiveColorPrimary: Colors.grey,
+        activeColorPrimary: Colors.white,
+        inactiveColorPrimary: CupertinoColors.systemGrey5,
       ),
       PersistentBottomNavBarItem(
         icon: const Icon(Icons.map),
-        title: ("Map"),
-        activeColorPrimary: Colors.green,
-        inactiveColorPrimary: Colors.grey,
+        activeColorPrimary: Colors.white,
+        inactiveColorPrimary: CupertinoColors.systemGrey5,
       ),
       PersistentBottomNavBarItem(
         icon: const Icon(Icons.photo_library_sharp),
-        title: ("Photo"),
-        activeColorPrimary: Colors.orangeAccent,
-        inactiveColorPrimary: CupertinoColors.systemGrey,
+        activeColorPrimary: Colors.white,
+        inactiveColorPrimary: CupertinoColors.systemGrey5,
       ),
       PersistentBottomNavBarItem(
         icon: const Icon(Icons.info),
-        title: ("Info"),
-        activeColorPrimary: Colors.grey,
-        inactiveColorPrimary: CupertinoColors.systemGrey,
+        activeColorPrimary: Colors.white,
+        inactiveColorPrimary: CupertinoColors.systemGrey5,
       ),
     ];
   }

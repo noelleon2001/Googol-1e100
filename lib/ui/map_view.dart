@@ -191,7 +191,7 @@ class _MapViewState extends State<MapView> {
             position: place.latLng,
             infoWindow: InfoWindow(
                 title: place.name,
-                snippet: place.formattedAddress
+                snippet: place.formattedAddress,
             )))
       });
 
@@ -250,7 +250,13 @@ class _MapViewState extends State<MapView> {
     final lng = detail.result.geometry!.location.lng;
 
     markers.clear();
-    markers.add(Marker(markerId: const MarkerId("0"),position: LatLng(lat, lng),infoWindow: InfoWindow(title: detail.result.name)));
+    markers.add(Marker(
+      markerId: const MarkerId("0"),
+      position: LatLng(lat, lng),
+      infoWindow: InfoWindow(
+        title: detail.result.name, 
+        snippet: detail.result.formattedAddress,
+      )));
 
     setState(() {});
 
