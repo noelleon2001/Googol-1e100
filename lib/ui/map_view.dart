@@ -29,9 +29,11 @@ final homeScaffoldKey = GlobalKey<ScaffoldState>();
 class _MapViewState extends State<MapView> {
   late GoogleMapController mapController;
 
-  LatLng? currentLatLng;
   Location location = Location();
-  LocationData? _currentLocation;
+  LocationData? _currentLocationData;
+  LatLng? currentLatLng;
+
+
   final Mode _mode = Mode.overlay;
   String dropDownValue = MapView.markerOptions.first;
 
@@ -41,7 +43,6 @@ class _MapViewState extends State<MapView> {
   void initState() {
     super.initState();
     getLocation();
-    findPlaces(dropDownValue);
   }
 
   void _onMapCreated(GoogleMapController controller) {
@@ -134,20 +135,22 @@ class _MapViewState extends State<MapView> {
       }
     }
 
-    _currentLocation = await location.getLocation();
+    _currentLocationData = await location.getLocation();
 
-    if (_currentLocation != null){
-      currentLatLng = LatLng(_currentLocation!.latitude!,_currentLocation!.longitude!);
+    if (_currentLocationData != null){
+      currentLatLng = LatLng(_currentLocationData!.latitude!,_currentLocationData!.longitude!);
       location.onLocationChanged.listen((LocationData currentLocation) {
         if (mounted){
           setState(() {
-            _currentLocation = currentLocation;
+            _currentLocationData = currentLocation;
             currentLatLng = LatLng(currentLocation.latitude!,currentLocation.longitude!);
 
           });
         };
       });
     }
+
+    findPlaces(dropDownValue);
   }
 
   @override
@@ -172,10 +175,14 @@ class _MapViewState extends State<MapView> {
   Sets markers
   * */
   void findPlaces(String query) async{
+    if (_currentLocationData == null) {
+      return;
+    }
+
     var url = Uri.https('maps.googleapis.com', 'maps/api/place/textsearch/json',
         {'query': query,
           'radius': '5000',
-          'location':'3.0639,101.600',
+          'location':'${_currentLocationData!.latitude},${_currentLocationData!.longitude}',
           'key': dotenv.env['GMAP_KEY']});
     var response = await http.post(url);
 
