@@ -43,10 +43,10 @@ class MyApp extends StatelessWidget {
       title: 'BinBrain',
       theme: ThemeData(
         colorScheme: ColorScheme.fromSwatch().copyWith(
-          primary: const Color(0xFF58D5D3),
-          secondary: const Color(0xFF58D5D3)
+          primary: const Color(0xFF55BFBD),
+          secondary: const Color(0xFF58D5D3),
         ), 
-        textTheme: GoogleFonts.interTextTheme(Theme.of(context).textTheme),
+        textTheme: GoogleFonts.robotoTextTheme(Theme.of(context).textTheme),
       ),
       home: const NavigationBarWidget(),
       debugShowCheckedModeBanner: false,
@@ -97,7 +97,7 @@ class _NavigationBarWidgetState extends State<NavigationBarWidget> {
         curve: Curves.ease,
         duration: Duration(milliseconds: 200),
       ),
-      navBarStyle: NavBarStyle.style14,
+      navBarStyle: NavBarStyle.style3,
       onItemSelected: _onItemTapped,
 
       // Choose the nav bar style with this property.

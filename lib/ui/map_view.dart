@@ -17,7 +17,7 @@ import '../models.dart';
 class MapView extends StatefulWidget {
   const MapView({Key? key}) : super(key: key);
 
-  static const List<String> markerOptions = ['Recycling Centres', 'Waste collectors'];
+  static const List<String> markerOptions = ['Recycling Centres', 'Waste Collectors', 'Heatmap'];
 
   @override
   State<MapView> createState() => _MapViewState();
@@ -36,6 +36,7 @@ class _MapViewState extends State<MapView> {
   String dropDownValue = MapView.markerOptions.first;
 
   Set<Marker> markers = {};
+  Set<Heatmap> heatmaps = {};
 
   @override
   void initState() {
@@ -74,6 +75,7 @@ class _MapViewState extends State<MapView> {
                 target: currentLatLng!,
                 zoom: 14.0,
               ),
+              heatmaps: heatmaps,
               myLocationEnabled: true,
               zoomGesturesEnabled: true,
               markers:markers,
@@ -82,10 +84,10 @@ class _MapViewState extends State<MapView> {
            Padding(
              padding: const EdgeInsets.all(8.0),
              child: Container(
-               padding: EdgeInsets.all(5),
+               padding: EdgeInsets.symmetric(vertical: 3, horizontal: 15),
                decoration: BoxDecoration(
                  color: Colors.white,
-                 borderRadius: BorderRadius.circular(12)
+                 borderRadius: BorderRadius.circular(7)
                ),
                child: DropdownButton(
                    value: dropDownValue,
@@ -97,7 +99,13 @@ class _MapViewState extends State<MapView> {
                      setState(() {
                        dropDownValue = value!;
                      });
-                     findPlaces(dropDownValue);
+                     if (value != 'Heatmap') {
+                      findPlaces(dropDownValue);
+                      heatmaps.clear();
+                     } else {
+                      markers.clear();
+                      fetchHeatmaps();
+                     }
                    },
                ),
              ),
@@ -251,7 +259,7 @@ class _MapViewState extends State<MapView> {
 
     markers.clear();
     markers.add(Marker(
-      markerId: const MarkerId("0"),
+      markerId: MarkerId("0"),
       position: LatLng(lat, lng),
       infoWindow: InfoWindow(
         title: detail.result.name, 
@@ -261,6 +269,44 @@ class _MapViewState extends State<MapView> {
     setState(() {});
 
     mapController.animateCamera(CameraUpdate.newLatLngZoom(LatLng(lat, lng), 14.0));
+  }
+
+  void fetchHeatmaps() {
+    final List<WeightedLatLng> points = [
+      WeightedLatLng(LatLng(3.157525, 101.659132), weight: 2),
+      WeightedLatLng(LatLng(3.097196, 101.707142), weight: 5),
+      WeightedLatLng(LatLng(3.119851, 101.674244), weight: 7),
+      WeightedLatLng(LatLng(3.157515, 101.689878), weight: 3),
+      WeightedLatLng(LatLng(3.106070, 101.686937), weight: 6),
+      WeightedLatLng(LatLng(3.156242, 101.668536), weight: 1),
+      WeightedLatLng(LatLng(3.110774, 101.699199), weight: 8),
+      WeightedLatLng(LatLng(3.089289, 101.711987), weight: 2),
+      WeightedLatLng(LatLng(3.103030, 101.673949), weight: 9),
+      WeightedLatLng(LatLng(3.143964, 101.683129), weight: 7),
+      WeightedLatLng(LatLng(3.161042, 101.685302), weight: 4),
+      WeightedLatLng(LatLng(3.103375, 101.670080), weight: 3),
+      WeightedLatLng(LatLng(3.154829, 101.676574), weight: 2),
+      WeightedLatLng(LatLng(3.128071, 101.700733), weight: 6),
+      WeightedLatLng(LatLng(3.164278, 101.677390), weight: 8),
+      WeightedLatLng(LatLng(3.120728, 101.703317), weight: 4),
+    ];
+
+    setState(() {
+      heatmaps.add(
+        Heatmap(
+          heatmapId: HeatmapId('0'),
+          data: points,
+          radius: 30,
+          opacity: 1,
+          // gradient: HeatmapGradient(
+          //   colors: [
+          //     HeatmapGradientColor(Colors.green, 0.2),
+          //     HeatmapGradientColor(Colors.red, 0.8),
+          //   ],
+          // ),
+        ),
+      );
+    });
   }
 }
 

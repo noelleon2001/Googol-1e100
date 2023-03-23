@@ -35,19 +35,19 @@ class AboutView extends StatelessWidget {
             // ),
             // const SizedBox(height: 8),
             Padding (
-              padding: const EdgeInsets.symmetric(horizontal: 20),
-              child: ab.addDescription('BinBrain is an innovative app that leverages artificial intelligence using advanced object detection models to make recycling easier and more accessible for everyone.'),
+              padding: const EdgeInsets.symmetric(horizontal: 15),
+              child: ab.addDescription('BinBrain is an app that leverages artificial intelligence using advanced object detection models to make recycling easier and more accessible for everyone.'),
             ),
             Padding (
-              padding: const EdgeInsets.symmetric(horizontal: 20),
+              padding: const EdgeInsets.symmetric(horizontal: 15),
               child: ab.addDescription('Designed and built by Chung Chin Leon and Sadeeptha Bandara for Kitahack 2023.'),
             ),
             Padding (
-              padding: const EdgeInsets.symmetric(horizontal: 20),
+              padding: const EdgeInsets.symmetric(horizontal: 15),
               child: ab.addGroup("Connect with us"),
             ),
             Padding (
-              padding: const EdgeInsets.symmetric(horizontal: 20),
+              padding: const EdgeInsets.symmetric(horizontal: 15),
               child: ab.addEmail("hban0006@student.monash@gmail.com"),
             ),
             

@@ -47,7 +47,17 @@ dependencies:
   mime:
   firebase_ml_model_downloader: ^0.2.0+9
   location: ^4.4.0
-  google_maps_flutter: ^2.2.4
+  # google_maps_flutter: ^2.2.4
+  google_maps_flutter:
+    git:
+      url: https://github.com/Rexios80/plugins-1
+      ref: 27485e299eb3aa0025b707e3a8a9d37da301c914
+      path: packages/google_maps_flutter/google_maps_flutter
+  google_maps_flutter_web:
+    git:
+      url: https://github.com/Rexios80/plugins-1
+      ref: 27485e299eb3aa0025b707e3a8a9d37da301c914
+      path: packages/google_maps_flutter/google_maps_flutter_web
   http: ^0.13.5
   flutter_dotenv: ^5.0.2
   flutter_google_places: ^0.3.0
@@ -59,6 +69,23 @@ dependencies:
   persistent_bottom_nav_bar: ^5.0.2
   flutter_about_page: ^0.0.1
   google_fonts: ^4.0.3
+
+dependency_overrides:
+  google_maps_flutter_android:
+    git:
+      url: https://github.com/Rexios80/plugins-1
+      ref: 27485e299eb3aa0025b707e3a8a9d37da301c914
+      path: packages/google_maps_flutter/google_maps_flutter_android
+  google_maps_flutter_ios:
+    git:
+      url: https://github.com/Rexios80/plugins-1
+      ref: 27485e299eb3aa0025b707e3a8a9d37da301c914
+      path: packages/google_maps_flutter/google_maps_flutter_ios
+  google_maps_flutter_platform_interface:
+    git:
+      url: https://github.com/Rexios80/plugins-1
+      ref: 27485e299eb3aa0025b707e3a8a9d37da301c914
+      path: packages/google_maps_flutter/google_maps_flutter_platform_interface
 
 dev_dependencies:
   flutter_test:
