@@ -138,6 +138,13 @@ class _NavigationBarWidgetState extends State<NavigationBarWidget> {
         )
       )
     );
-
-
+  }
+  List<Widget> _buildScreens() {
+      return [
+        const ObjectDetectorView(),
+        const MapView(),
+        const GameView(),
+        const AboutView()
+      ];
+    }
 }
