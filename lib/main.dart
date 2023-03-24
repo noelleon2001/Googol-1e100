@@ -43,8 +43,8 @@ class MyApp extends StatelessWidget {
       title: 'BinBrain',
       theme: ThemeData(
         colorScheme: ColorScheme.fromSwatch().copyWith(
-          primary: const Color(0xFF55BFBD),
-          secondary: const Color(0xFF58D5D3),
+          primary: Color(0xFF0C9968),
+          secondary: Color.fromRGBO(154, 169, 166, 1),
         ), 
         textTheme: GoogleFonts.robotoTextTheme(Theme.of(context).textTheme),
       ),
@@ -62,9 +62,28 @@ class NavigationBarWidget extends StatefulWidget {
 }
 
 class _NavigationBarWidgetState extends State<NavigationBarWidget> {
+  int selectedIndex = 0;
   bool _switch = false;
 
   late PersistentTabController _controller;
+
+  static const List<Widget> _widgetOptions = <Widget>[
+    ObjectDetectorView(),
+    AboutView(),
+    GameView(),
+    AboutView()
+  ];
+
+  void _onItemTapped(int index) async {
+    setState(() {
+      selectedIndex = index;
+      _switch = true;
+    });
+    await Future.delayed(Duration(milliseconds: 500));
+    setState(() {
+      _switch = false;
+    });
+  }
 
   @override
   void initState() {
@@ -74,79 +93,51 @@ class _NavigationBarWidgetState extends State<NavigationBarWidget> {
 
   @override
   Widget build(BuildContext context) {
-    return _switch ? const Scaffold(body: Center(child: CircularProgressIndicator())) : PersistentTabView(
-      context,
-      controller: _controller,
-      screens: _buildScreens(),
-      items: _navBarsItems(),
-      confineInSafeArea: true,
-      backgroundColor: const Color(0xFF58D5D3),// Default is Colors.white.
-      resizeToAvoidBottomInset: true,
-      hideNavigationBarWhenKeyboardShows:
-      true, // Recommended to set 'resizeToAvoidBottomInset' as true while using this argument. Default is true.
-      popAllScreensOnTapOfSelectedTab: true,
-      popActionScreens: PopActionScreensType.all,
-      itemAnimationProperties: const ItemAnimationProperties(
-        // Navigation Bar's items animation properties.
-        duration: Duration(milliseconds: 200),
-        curve: Curves.ease,
-      ),
-      screenTransitionAnimation: const ScreenTransitionAnimation(
-        // Screen transition animation on change of selected tab.
-        animateTabTransition: true,
-        curve: Curves.ease,
-        duration: Duration(milliseconds: 200),
-      ),
-      navBarStyle: NavBarStyle.style3,
-      onItemSelected: _onItemTapped,
-
-      // Choose the nav bar style with this property.
+    return Scaffold(
+      body: Center(
+        child: _switch == true ? CircularProgressIndicator() : _widgetOptions.elementAt(selectedIndex),
+        ),
+      bottomNavigationBar: SizedBox(
+        height: 65,
+        child: Container(
+          decoration: const BoxDecoration(
+            boxShadow: <BoxShadow>[
+              BoxShadow(
+                  color: Color.fromARGB(23, 0, 0, 0),
+                  blurRadius: 50.0,
+              )
+            ],
+          ),
+          child: BottomNavigationBar(
+            backgroundColor: Colors.white,
+            type: BottomNavigationBarType.fixed,
+            items: <BottomNavigationBarItem>[
+              BottomNavigationBarItem(
+                icon: Icon(selectedIndex == 0 ? Icons.home : Icons.home_outlined),
+                label: 'Home',
+              ),
+              BottomNavigationBarItem(
+                icon: Icon(selectedIndex == 1 ? Icons.map : Icons.map_outlined),
+                label: 'Map',
+              ),
+              BottomNavigationBarItem(
+                icon: Icon(selectedIndex == 2 ? Icons.add_a_photo : Icons.add_a_photo_outlined),
+                label: 'Game',
+              ),
+              BottomNavigationBarItem(
+                icon: Icon(selectedIndex == 3 ? Icons.info : Icons.info_outline),
+                label: 'About',
+              ),
+            ],
+            currentIndex: selectedIndex,
+            unselectedItemColor: Colors.grey[500],
+            selectedFontSize: 0,
+            unselectedFontSize: 0,
+            onTap: _onItemTapped,
+          ),
+        )
+      )
     );
-  }
-
-  void _onItemTapped(int index) async {
-    setState(() {
-      _switch = true;
-    });
-    // await Future.delayed(const Duration(milliseconds: 500));
-    setState(() {
-      _switch = false;
-    });
-  }
-
-  List<Widget> _buildScreens() {
-      return [
-        const ObjectDetectorView(),
-        const MapView(),
-        const GameView(),
-        const AboutView()
-      ];
-    }
-
-  List<PersistentBottomNavBarItem> _navBarsItems() {
-    return [
-      PersistentBottomNavBarItem(
-        icon: const Icon(Icons.home),
-        activeColorPrimary: Colors.white,
-        inactiveColorPrimary: CupertinoColors.systemGrey5,
-      ),
-      PersistentBottomNavBarItem(
-        icon: const Icon(Icons.map),
-        activeColorPrimary: Colors.white,
-        inactiveColorPrimary: CupertinoColors.systemGrey5,
-      ),
-      PersistentBottomNavBarItem(
-        icon: const Icon(Icons.photo_library_sharp),
-        activeColorPrimary: Colors.white,
-        inactiveColorPrimary: CupertinoColors.systemGrey5,
-      ),
-      PersistentBottomNavBarItem(
-        icon: const Icon(Icons.info),
-        activeColorPrimary: Colors.white,
-        inactiveColorPrimary: CupertinoColors.systemGrey5,
-      ),
-    ];
-  }
 
 
 }
