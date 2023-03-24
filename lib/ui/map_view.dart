@@ -9,6 +9,7 @@ import 'package:http/http.dart' as http;
 import 'package:flutter_google_places/flutter_google_places.dart';
 import 'package:awesome_snackbar_content/awesome_snackbar_content.dart';
 import 'package:google_api_headers/google_api_headers.dart';
+import 'package:custom_info_window/custom_info_window.dart';
 import 'package:map_launcher/map_launcher.dart' as mpl;
 import 'dart:developer' as dev;
 
@@ -22,12 +23,12 @@ class MapView extends StatefulWidget {
   @override
   State<MapView> createState() => _MapViewState();
 }
-
 final homeScaffoldKey = GlobalKey<ScaffoldState>();
 
 
 class _MapViewState extends State<MapView> {
   late GoogleMapController mapController;
+  CustomInfoWindowController _customInfoWindowController = CustomInfoWindowController();
 
   LatLng? currentLatLng;
   Location location = Location();
@@ -47,6 +48,7 @@ class _MapViewState extends State<MapView> {
 
   void _onMapCreated(GoogleMapController controller) {
     mapController = controller;
+    _customInfoWindowController.googleMapController = controller;
   }
 
   @override
@@ -71,6 +73,12 @@ class _MapViewState extends State<MapView> {
           children: [
             GoogleMap(
               onMapCreated: _onMapCreated,
+              onTap: (position) {
+                _customInfoWindowController.hideInfoWindow!();
+              },
+              onCameraMove: (position) {
+                _customInfoWindowController.onCameraMove!();
+              },
               initialCameraPosition: CameraPosition(
                 target: currentLatLng!,
                 zoom: 14.0,
@@ -80,6 +88,12 @@ class _MapViewState extends State<MapView> {
               zoomGesturesEnabled: true,
               markers:markers,
               compassEnabled: false,
+            ),
+            CustomInfoWindow(
+              controller: _customInfoWindowController,
+              // height: 75,
+              // width: 150,
+              offset: 50,
             ),
            Padding(
              padding: const EdgeInsets.all(8.0),
@@ -100,8 +114,8 @@ class _MapViewState extends State<MapView> {
                        dropDownValue = value!;
                      });
                      if (value != 'Heatmap') {
-                      findPlaces(dropDownValue);
                       heatmaps.clear();
+                      findPlaces(dropDownValue);
                      } else {
                       markers.clear();
                       fetchHeatmaps();
@@ -161,6 +175,7 @@ class _MapViewState extends State<MapView> {
   @override
   void dispose() {
     mapController.dispose();
+    _customInfoWindowController.dispose();
     super.dispose();
   }
 
@@ -197,10 +212,58 @@ class _MapViewState extends State<MapView> {
         markers.add(Marker(
             markerId: MarkerId(place.name),
             position: place.latLng,
-            infoWindow: InfoWindow(
-                title: place.name,
-                snippet: place.formattedAddress,
-            )))
+            onTap: () {
+              _customInfoWindowController.addInfoWindow!(
+                Column (
+                  children: [
+                    Expanded(
+                      child: Container(
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Container(
+                              decoration: BoxDecoration(
+                                image: DecorationImage(
+                                  image: NetworkImage(place.icon!),
+                                  fit: BoxFit.fitWidth,
+                                  filterQuality: FilterQuality.high),
+                                  borderRadius: BorderRadius.circular(10)
+                                )
+                              ),
+                          ],
+                        )
+                        // Padding(
+                        //   padding: const EdgeInsets.all(8.0),
+                        //   child: Row(
+                        //     mainAxisAlignment: MainAxisAlignment.center,
+                        //     children: [
+                        //       Icon(
+                        //         Icons.account_circle,
+                        //         color: Colors.white,
+                        //         size: 30,
+                        //       ),
+                        //       SizedBox(
+                        //         width: 8.0,
+                        //       ),
+                        //       Text(
+                        //         "I am here",
+                        //       )
+                        //     ],
+                        //   ),
+                        // ),
+                      ),
+                    ),
+                  ]
+                ), place.latLng
+              );
+            }
+          )
+        )
       });
 
     }

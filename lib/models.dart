@@ -30,12 +30,14 @@ class Place{
   final String formattedAddress;
   final String name;
   final LatLng latLng;
+  final String? icon;
   // double? rating;
 
   Place({
     required this.formattedAddress,
     required this.name,
     required this.latLng,
+    this.icon,
     // this.rating
   });
 
@@ -49,6 +51,7 @@ class Place{
       formattedAddress: json['formatted_address'],
       latLng: LatLng(lat!, lng!),
       name: json['name'],
+      icon: json['icon'],
       // rating: json['rating']
     );
   }

@@ -69,7 +69,7 @@ class _NavigationBarWidgetState extends State<NavigationBarWidget> {
 
   static const List<Widget> _widgetOptions = <Widget>[
     ObjectDetectorView(),
-    AboutView(),
+    MapView(),
     GameView(),
     AboutView()
   ];
@@ -98,7 +98,7 @@ class _NavigationBarWidgetState extends State<NavigationBarWidget> {
         child: _switch == true ? CircularProgressIndicator() : _widgetOptions.elementAt(selectedIndex),
         ),
       bottomNavigationBar: SizedBox(
-        height: 65,
+        height: 60,
         child: Container(
           decoration: const BoxDecoration(
             boxShadow: <BoxShadow>[
