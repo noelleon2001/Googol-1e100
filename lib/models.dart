@@ -34,7 +34,7 @@ class Place{
   final bool? openNow;
   final String? photoReference;
   final String? icon;
-  // double? rating;
+  double? rating;
 
   Place({
     required this.formattedAddress,
@@ -44,7 +44,7 @@ class Place{
     this.openNow,
     this.photoReference,
     this.icon,
-    // this.rating
+    this.rating
   });
 
   factory Place.fromJson(Map<String, dynamic> json){
@@ -61,7 +61,7 @@ class Place{
       openNow: json['opening_hours'] != null ? json['opening_hours']['open_now'] : null,
       photoReference: json['photos'] != null ? json['photos'][0]['photo_reference'] : null,
       icon: json['icon'],
-      // rating: json['rating']
+      rating: json['rating'].toDouble(),
     );
   }
 }

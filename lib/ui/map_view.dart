@@ -96,7 +96,7 @@ class _MapViewState extends State<MapView> {
             CustomInfoWindow(
               controller: _customInfoWindowController,
               height: isPhoto ? 230 : 130,
-              width: 275,
+              width: 300,
               offset: 50,
             ),
            Padding(
@@ -256,7 +256,7 @@ class _MapViewState extends State<MapView> {
                     children: [
                       place.photoReference != null ? Container(
                         height: 100,
-                        width: 275,
+                        width: 300,
                         decoration: BoxDecoration(
                           image: DecorationImage(
                             image: getImage(place.photoReference),
@@ -271,11 +271,20 @@ class _MapViewState extends State<MapView> {
                           mainAxisAlignment: MainAxisAlignment.start,
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Text(place.name, 
-                              style: TextStyle(fontWeight: FontWeight.bold),
-                              overflow: TextOverflow.ellipsis,
-                              maxLines: 2,
-                              softWrap: true
+                            Row(
+                              children: [
+                                SizedBox(width: 220, 
+                                  child: Text(place.name, 
+                                    style: TextStyle(fontWeight: FontWeight.bold),
+                                    overflow: TextOverflow.ellipsis,
+                                    maxLines: 2,
+                                    softWrap: true
+                                  )
+                                ),
+                                const Spacer(),
+                                Text(place.rating.toString()),
+                                Icon(Icons.star_rounded, color: Colors.amberAccent)
+                              ],
                             ),
                             SizedBox(height: 2.5),
                             place.businessStatus == 'OPERATIONAL' ? 
