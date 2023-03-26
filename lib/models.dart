@@ -30,6 +30,9 @@ class Place{
   final String formattedAddress;
   final String name;
   final LatLng latLng;
+  final String businessStatus;
+  final bool? openNow;
+  final String? photoReference;
   final String? icon;
   // double? rating;
 
@@ -37,6 +40,9 @@ class Place{
     required this.formattedAddress,
     required this.name,
     required this.latLng,
+    required this.businessStatus,
+    this.openNow,
+    this.photoReference,
     this.icon,
     // this.rating
   });
@@ -49,8 +55,11 @@ class Place{
 
     return Place(
       formattedAddress: json['formatted_address'],
-      latLng: LatLng(lat!, lng!),
       name: json['name'],
+      latLng: LatLng(lat!, lng!),
+      businessStatus: json['business_status'],
+      openNow: json['opening_hours'] != null ? json['opening_hours']['open_now'] : null,
+      photoReference: json['photos'] != null ? json['photos'][0]['photo_reference'] : null,
       icon: json['icon'],
       // rating: json['rating']
     );

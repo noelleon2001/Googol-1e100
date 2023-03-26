@@ -29,6 +29,7 @@ final homeScaffoldKey = GlobalKey<ScaffoldState>();
 class _MapViewState extends State<MapView> {
   late GoogleMapController mapController;
   CustomInfoWindowController _customInfoWindowController = CustomInfoWindowController();
+  late gs.GoogleMapsPlaces places;
 
   LatLng? currentLatLng;
   Location location = Location();
@@ -39,9 +40,12 @@ class _MapViewState extends State<MapView> {
   Set<Marker> markers = {};
   Set<Heatmap> heatmaps = {};
 
+  bool isPhoto = false;
+
   @override
   void initState() {
     super.initState();
+    initPlaces();
     getLocation();
     findPlaces(dropDownValue);
   }
@@ -91,8 +95,8 @@ class _MapViewState extends State<MapView> {
             ),
             CustomInfoWindow(
               controller: _customInfoWindowController,
-              // height: 75,
-              // width: 150,
+              height: isPhoto ? 230 : 130,
+              width: 275,
               offset: 50,
             ),
            Padding(
@@ -110,6 +114,7 @@ class _MapViewState extends State<MapView> {
                    }).toList(),
                    elevation: 16,
                    onChanged: (String? value){
+                     _customInfoWindowController.hideInfoWindow!();
                      setState(() {
                        dropDownValue = value!;
                      });
@@ -132,6 +137,13 @@ class _MapViewState extends State<MapView> {
         child: const Icon(Icons.search)
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.startFloat,
+    );
+  }
+
+  initPlaces() async{
+    places = gs.GoogleMapsPlaces(
+        apiKey: dotenv.env['GMAP_KEY'],
+        apiHeaders: await const GoogleApiHeaders().getHeaders()
     );
   }
 
@@ -212,54 +224,81 @@ class _MapViewState extends State<MapView> {
         markers.add(Marker(
             markerId: MarkerId(place.name),
             position: place.latLng,
-            onTap: () {
+            onTap: () async {
+              // check if has photo
+              setState(() {
+                isPhoto = place.photoReference != null ? true : false;
+              });
+
+              // for offseting the camera to make space for info window
+              ScreenCoordinate screenCoordinate = await mapController.getScreenCoordinate(place.latLng);
+              LatLng newCameraPosition = await mapController.getLatLng(
+                ScreenCoordinate(
+                  x: screenCoordinate.x,
+                  y: isPhoto ? screenCoordinate.y - 550 : screenCoordinate.y - 300,
+                ),
+              );
+              mapController.animateCamera(CameraUpdate.newLatLng(newCameraPosition));
+
+              // add info window
               _customInfoWindowController.addInfoWindow!(
-                Column (
-                  children: [
-                    Expanded(
-                      child: Container(
+                Container(
+                  height: 300,
+                  width: 200,
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    border: Border.all(color: Colors.grey),
+                    borderRadius: BorderRadius.circular(10)
+                  ),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      place.photoReference != null ? Container(
+                        height: 100,
+                        width: 275,
                         decoration: BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.circular(10),
-                        ),
+                          image: DecorationImage(
+                            image: getImage(place.photoReference),
+                            fit: BoxFit.fitWidth,
+                            filterQuality: FilterQuality.high),
+                          borderRadius: BorderRadius.vertical(top: Radius.circular(10)),
+                        )
+                      ) : Container(width: 0, height: 0),
+                      Padding(
+                        padding: EdgeInsets.only(top: 10.0, left: 10.0, right: 10.0),
                         child: Column(
                           mainAxisAlignment: MainAxisAlignment.start,
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Container(
-                              decoration: BoxDecoration(
-                                image: DecorationImage(
-                                  image: NetworkImage(place.icon!),
-                                  fit: BoxFit.fitWidth,
-                                  filterQuality: FilterQuality.high),
-                                  borderRadius: BorderRadius.circular(10)
-                                )
-                              ),
+                            Text(place.name, 
+                              style: TextStyle(fontWeight: FontWeight.bold),
+                              overflow: TextOverflow.ellipsis,
+                              maxLines: 2,
+                              softWrap: true
+                            ),
+                            SizedBox(height: 2.5),
+                            place.businessStatus == 'OPERATIONAL' ? 
+                            Text(place.openNow == true ? 'Open Now' : 'Closed', 
+                              style: TextStyle(
+                                color: place.openNow == true ? Colors.green : Colors.red, 
+                                fontWeight: FontWeight.bold),
+                            ) : Text(
+                              place.businessStatus == 'CLOSED_TEMPORARILY' ? 'Temporarily Closed' : 'Permanently Closed',
+                              style: TextStyle(color: place.businessStatus == 'CLOSED_TEMPORARILY' ? Colors.grey : Colors.red)),
+                            SizedBox(height: 5.0),
+                            Text(place.formattedAddress, 
+                              overflow: TextOverflow.ellipsis,
+                              maxLines: 3,
+                              softWrap: true
+                            ),
                           ],
                         )
-                        // Padding(
-                        //   padding: const EdgeInsets.all(8.0),
-                        //   child: Row(
-                        //     mainAxisAlignment: MainAxisAlignment.center,
-                        //     children: [
-                        //       Icon(
-                        //         Icons.account_circle,
-                        //         color: Colors.white,
-                        //         size: 30,
-                        //       ),
-                        //       SizedBox(
-                        //         width: 8.0,
-                        //       ),
-                        //       Text(
-                        //         "I am here",
-                        //       )
-                        //     ],
-                        //   ),
-                        // ),
-                      ),
-                    ),
-                  ]
-                ), place.latLng
+                      )
+                    ],
+                  ),
+                )
+                , place.latLng
               );
             }
           )
@@ -270,6 +309,11 @@ class _MapViewState extends State<MapView> {
     setState(() => {
       this.markers = markers
     });
+  }
+
+  ImageProvider<Object> getImage(photoReference) {
+    String photoUrl = places.buildPhotoUrl(photoReference: photoReference, maxWidth: 400);
+    return Image.network(photoUrl).image;
   }
 
   Future<void> _handleSearch() async {
@@ -310,11 +354,6 @@ class _MapViewState extends State<MapView> {
   }
 
   Future<void> markSearchLocation(gs.Prediction p, ScaffoldState? currentState) async {
-    gs.GoogleMapsPlaces places = gs.GoogleMapsPlaces(
-        apiKey: dotenv.env['GMAP_KEY'],
-        apiHeaders: await const GoogleApiHeaders().getHeaders()
-    );
-
     gs.PlacesDetailsResponse detail = await places.getDetailsByPlaceId(p.placeId!);
 
     final lat = detail.result.geometry!.location.lat;
