@@ -3,14 +3,14 @@ import 'package:flutter/material.dart';
 import '../interactive/take_pic.dart';
 import '../interactive/verify.dart';
 
-class selectView extends StatefulWidget {
-  const selectView({Key? key}): super(key: key);
+class SelectView extends StatefulWidget {
+  const SelectView({Key? key}): super(key: key);
 
   @override
-  selectViewState createState() => selectViewState();
+  SelectViewState createState() => SelectViewState();
 }
 
-class selectViewState extends State<selectView> {
+class SelectViewState extends State<SelectView> {
 
   @override
   Widget build(BuildContext context) {

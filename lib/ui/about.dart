@@ -8,38 +8,49 @@ class AboutView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     AboutPage ab = AboutPage();
-    ab.customStyle(descFontFamily: "Roboto",listTextFontFamily: "RobotoMedium");
+    ab.customStyle(descFontFamily: "Inter", listTextFontFamily: "InterMedium");
 
     return Scaffold(
         backgroundColor: Colors.white,
         appBar: AppBar(
-          title: Text("About Page"),
-          centerTitle: true,
+          title: Text("About BinBrain"),
         ),
-        body: ListView(
-
+        body: 
+          ListView(
           children: [
-            Padding(
-              padding: const EdgeInsets.all(8),
+            Padding (
+              padding: const EdgeInsets.all(40),
               child: ab.setImage("assets/logo.png"),
             ),
-            Center(
-              child: ab.addDescription("Can ChatGPT classify trash tho?"),
+            // Center(
+            //   child: ab.addDescription("Can ChatGPT classify trash tho?"),
+            // ),
+            // ab.addWidget(
+            //   const Text(
+            //     "Version 1.0",
+            //     style: TextStyle(
+            //         fontFamily: "RobotoMedium"
+            //     ),
+            //   ),
+            // ),
+            // const SizedBox(height: 8),
+            Padding (
+              padding: const EdgeInsets.symmetric(horizontal: 15),
+              child: ab.addDescription('BinBrain is an app that leverages artificial intelligence using advanced object detection models to make recycling easier and more accessible for everyone.'),
             ),
-            ab.addWidget(
-              const Text(
-                "Version 1.0",
-                style: TextStyle(
-                    fontFamily: "RobotoMedium"
-                ),
-              ),
+            Padding (
+              padding: const EdgeInsets.symmetric(horizontal: 15),
+              child: ab.addDescription('Designed and built by Chung Chin Leon and Sadeeptha Bandara for Kitahack 2023.'),
             ),
-            const SizedBox(height: 8),
-            ab.addDescription('BinBrain is an innovative app that uses Advanced Object Detection to make recycling easier and more accessible for everyone'),
-            ab.addDescription('Designed by Chung Chin Leon and Sadeeptha Bandara for Kitahack 2023'),
-            ab.addGroup("Connect with us"),
-            ab.addEmail("hban0006@student.monash@gmail.com"),
-
+            Padding (
+              padding: const EdgeInsets.symmetric(horizontal: 15),
+              child: ab.addGroup("Connect with us"),
+            ),
+            Padding (
+              padding: const EdgeInsets.symmetric(horizontal: 15),
+              child: ab.addEmail("hban0006@student.monash@gmail.com"),
+            ),
+            
           ],
         )
     );
