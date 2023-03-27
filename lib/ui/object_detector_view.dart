@@ -42,7 +42,7 @@ class _ObjectDetectorViewState extends State<ObjectDetectorView> {
   Widget build(BuildContext context) {
 
     return CameraView(
-      title: 'Waste Classifier',
+      title: 'Object Detector',
       customPaint: _customPaint,
       text: _text,
       onImage: (inputImage) {

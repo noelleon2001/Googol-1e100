@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:flutter_flip_view/flutter_flip_view.dart';
 
 import 'package:http/http.dart' as http;
 import 'dart:developer' as dev;
@@ -7,7 +8,9 @@ import 'dart:math';
 import 'dart:convert';
 
 class HomeView extends StatefulWidget {
-  const HomeView({Key? key}) : super(key: key);
+  final Function(int) buttonHandler;
+
+  const HomeView({Key? key, required this.buttonHandler}) : super(key: key);
 
   @override
   State<HomeView> createState() => _HomeViewState();
@@ -53,13 +56,28 @@ class _HomeViewState extends State<HomeView> {
         data = result.values.elementAt(index).toStringAsFixed(2);
       });
     }
-
-    dev.log(key.toString());
-    dev.log(data.toString());
   }
 
   @override
   Widget build(BuildContext context) {
+    final _buttonTexts = [
+      {
+        "title": "Object Detector",
+        "text": "Determine type of wastes using the camera",
+        "page": 1,
+      },
+      {
+        "title": "Map",
+        "text": "View important locations on the map",
+        "page": 2,
+      },
+      {
+        "title": "Classify Images",
+        "text":
+            "Help to classify waste and verify our images and improve our model!",
+        "page": 3,
+      },
+    ];
     return Scaffold(
         body: Stack(
       children: [
@@ -70,10 +88,10 @@ class _HomeViewState extends State<HomeView> {
           fit: BoxFit.cover,
         )),
         Padding(
-            padding: EdgeInsets.only(left: 15, right: 15),
+            padding: EdgeInsets.only(left: 15, right: 15, bottom: 10),
             child:
                 Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-              const SizedBox(height: 85),
+              const SizedBox(height: 82),
               Padding(
                   padding: EdgeInsets.only(left: 10),
                   child: Column(
@@ -134,7 +152,7 @@ class _HomeViewState extends State<HomeView> {
                                 const SizedBox(height: 7.5),
                                 const Text('23 objects',
                                     style: TextStyle(
-                                        fontSize: 25,
+                                        fontSize: 20,
                                         fontWeight: FontWeight.bold)),
                                 const SizedBox(height: 2.5),
                                 Row(
@@ -143,7 +161,7 @@ class _HomeViewState extends State<HomeView> {
                                       Icons.arrow_drop_up,
                                       color: Colors.green,
                                     ),
-                                    Text("24% than average",
+                                    Text("24% vs avg",
                                         style: TextStyle(color: Colors.green)),
                                   ],
                                 )
@@ -172,7 +190,7 @@ class _HomeViewState extends State<HomeView> {
                                 const SizedBox(height: 7.5),
                                 const Text('5 images',
                                     style: TextStyle(
-                                        fontSize: 25,
+                                        fontSize: 20,
                                         fontWeight: FontWeight.bold)),
                                 const SizedBox(height: 2.5),
                                 Row(
@@ -181,7 +199,7 @@ class _HomeViewState extends State<HomeView> {
                                       Icons.arrow_drop_down,
                                       color: Colors.red,
                                     ),
-                                    Text("12% than average",
+                                    Text("12% vs avg",
                                         style: TextStyle(color: Colors.red)),
                                   ],
                                 )
@@ -221,17 +239,51 @@ class _HomeViewState extends State<HomeView> {
                                   style: const TextStyle(
                                       color: Colors.white, fontSize: 15),
                                 )
-                              : const Center(
-                                  child: SizedBox(
-                                      width: 20,
-                                      height: 20,
-                                      child: CircularProgressIndicator(
-                                          strokeWidth: 2.0))),
+                              : Padding(
+                                  padding: EdgeInsets.only(top: 10),
+                                  child: const Center(
+                                      child: SizedBox(
+                                          width: 20,
+                                          height: 20,
+                                          child: CircularProgressIndicator(
+                                              strokeWidth: 2.0)))),
                         ],
                       ))),
               const SizedBox(height: 10),
-              Text(
-                  'Help improve our object detection model by classifying waste and validating images!'),
+              Expanded(
+                  child: Row(
+                children: [
+                  for (var buttonText in _buttonTexts)
+                    Expanded(
+                      child: Card(
+                        clipBehavior: Clip.hardEdge,
+                        child: InkWell(
+                          splashColor: Colors.blue.withAlpha(30),
+                          onTap: () {
+                            widget.buttonHandler(
+                                int.parse(buttonText['page'].toString()));
+                          },
+                          child: Padding(
+                              padding: EdgeInsets.all(10),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  SizedBox(
+                                      height: 45,
+                                      child: Text(
+                                          buttonText['title'].toString(),
+                                          style: TextStyle(
+                                              fontSize: 17.5,
+                                              fontWeight: FontWeight.bold))),
+                                  Text(buttonText['text'].toString()),
+                                  // Icon(Icons.camera, color: Colors.grey)
+                                ],
+                              )),
+                        ),
+                      ),
+                    ),
+                ],
+              ))
             ]))
       ],
     ));

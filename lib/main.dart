@@ -68,13 +68,11 @@ class _NavigationBarWidgetState extends State<NavigationBarWidget> {
 
   late PersistentTabController _controller;
 
-  static const List<Widget> _widgetOptions = <Widget>[
-    HomeView(),
-    ObjectDetectorView(),
-    MapView(),
-    SelectView(),
-    AboutView()
-  ];
+  void _changePage (int index) {
+    setState(() {
+      selectedIndex = index;
+    });
+  }
 
   void _onItemTapped(int index) async {
     setState(() {
@@ -95,6 +93,14 @@ class _NavigationBarWidgetState extends State<NavigationBarWidget> {
 
   @override
   Widget build(BuildContext context) {
+    final List<Widget> _widgetOptions = <Widget>[
+      HomeView(buttonHandler: _changePage),
+      ObjectDetectorView(),
+      MapView(),
+      SelectView(),
+      AboutView()
+    ];
+
     return Scaffold(
       body: Center(
         child: _switch == true ? CircularProgressIndicator() : _widgetOptions.elementAt(selectedIndex),
@@ -145,13 +151,4 @@ class _NavigationBarWidgetState extends State<NavigationBarWidget> {
       )
     );
   }
-  List<Widget> _buildScreens() {
-      return [
-        const HomeView(),
-        const ObjectDetectorView(),
-        const MapView(),
-        const SelectView(),
-        const AboutView()
-      ];
-    }
 }
