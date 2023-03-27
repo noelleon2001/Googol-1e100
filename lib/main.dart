@@ -130,10 +130,10 @@ class _NavigationBarWidgetState extends State<NavigationBarWidget> {
                 icon: Icon(selectedIndex == 3 ? Icons.add_a_photo : Icons.add_a_photo_outlined),
                 label: 'Game',
               ),
-              BottomNavigationBarItem(
-                icon: Icon(selectedIndex == 4 ? Icons.info : Icons.info_outline),
-                label: 'About',
-              ),
+              // BottomNavigationBarItem(
+              //   icon: Icon(selectedIndex == 4 ? Icons.info : Icons.info_outline),
+              //   label: 'About',
+              // ),
             ],
             currentIndex: selectedIndex,
             unselectedItemColor: Colors.grey[500],
