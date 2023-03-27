@@ -35,9 +35,10 @@ class VerifyViewState extends State<VerifyView> {
     firestoreRef.collection('dataset')
         .doc(fileName)
         .set({
-          'classification': classification,
+          'verified_classification': classification,
           'verified_time': FieldValue.serverTimestamp(),
           'verified': true,
+          'verified_changes': _material != classification,
         },
         SetOptions(merge: true),)
         .then((value) => print("Data Added"))
