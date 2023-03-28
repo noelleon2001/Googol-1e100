@@ -7,6 +7,8 @@ import 'dart:developer' as dev;
 import 'dart:math';
 import 'dart:convert';
 
+import 'package:shared_preferences/shared_preferences.dart';
+
 class HomeView extends StatefulWidget {
   final Function(int) buttonHandler;
 
@@ -21,10 +23,26 @@ class _HomeViewState extends State<HomeView> {
   String? data;
   String? key;
 
+  int _uploaded = 0;
+  int _verified = 0;
+
   @override
   void initState() {
     super.initState();
+    getUserStats();
     fetchData();
+  }
+
+  void getUserStats() async{
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+
+    if (prefs.containsKey('upload')){
+      _uploaded = prefs.getInt('upload')!;
+    }
+
+    if (prefs.containsKey('verify')){
+      _verified = prefs.getInt('verify')!;
+    }
   }
 
   void fetchData() async {
@@ -156,8 +174,8 @@ class _HomeViewState extends State<HomeView> {
                                     style:
                                         TextStyle(color: Colors.grey.shade700)),
                                 const SizedBox(height: 7.5),
-                                const Text('23 objects',
-                                    style: TextStyle(
+                                Text('$_uploaded objects',
+                                    style: const TextStyle(
                                         fontSize: 20,
                                         fontWeight: FontWeight.bold)),
                                 const SizedBox(height: 2.5),
@@ -194,8 +212,8 @@ class _HomeViewState extends State<HomeView> {
                                     style:
                                         TextStyle(color: Colors.grey.shade700)),
                                 const SizedBox(height: 7.5),
-                                const Text('5 images',
-                                    style: TextStyle(
+                                Text('$_verified images',
+                                    style: const TextStyle(
                                         fontSize: 20,
                                         fontWeight: FontWeight.bold)),
                                 const SizedBox(height: 2.5),

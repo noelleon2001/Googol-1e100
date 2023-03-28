@@ -3,6 +3,8 @@ import 'package:firebase_storage/firebase_storage.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'dart:typed_data';
 
+import 'package:shared_preferences/shared_preferences.dart';
+
 const numOfImagesLoaded = 5;
 
 class VerifyView extends StatefulWidget {
@@ -29,6 +31,7 @@ class VerifyViewState extends State<VerifyView> {
   }
 
   Future<void> modifyData(fileName, classification) async {
+
     setState(() {
       disableButton = true;
     });
@@ -40,13 +43,23 @@ class VerifyViewState extends State<VerifyView> {
           'verified': true,
         },
         SetOptions(merge: true),)
-        .then((value) => print("Data Added"))
+        .then((value) async {
+          print("Data Added");
+          final SharedPreferences prefs = await SharedPreferences.getInstance();
+          if (!prefs.containsKey('verify')){
+            await prefs.setInt('verify', 1);
+          } else{
+            await prefs.setInt('verify', prefs.getInt('verify')! + 1);
+          }
+         })
         .catchError((error) => print("Failed to add data: $error"));
 
     imagePointer++;
     setState(() {
       _image = null;
     });
+
+
   }
 
   Future<void> listImage() async {

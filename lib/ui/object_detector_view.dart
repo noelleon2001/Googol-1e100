@@ -66,7 +66,8 @@ class _ObjectDetectorViewState extends State<ObjectDetectorView> {
   }
 
   void switchModel(int index){
-    _canProcess = false;
+    // _canProcess = false;
+    // _objectDetector.close();
     currentModel = ObjectDetectorView.modelOptions[index];
     _initializeDetector(DetectionMode.stream);
   }

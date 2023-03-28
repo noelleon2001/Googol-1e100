@@ -11,6 +11,7 @@ import 'package:flutter_speed_dial/flutter_speed_dial.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import '../main.dart';
 
 // Future loadAsset() async {
@@ -233,6 +234,13 @@ class DisplayPictureScreenState extends State<DisplayPictureScreen> {
       context: context,
       builder: (BuildContext context) => _buildPopupDialog(context, true),
     );
+
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    if (!prefs.containsKey('upload')){
+      await prefs.setInt('upload', 1);
+    } else{
+      await prefs.setInt('upload', prefs.getInt('upload')! + 1);
+    }
 
     Navigator.of(context).pop();
   }

@@ -76,6 +76,7 @@ dependencies:
   flutter_svg: ^1.1.6
   flip_card: ^0.7.0
   lottie: ^2.3.1
+  shared_preferences: ^2.0.20
 
 dependency_overrides:
   google_maps_flutter:
