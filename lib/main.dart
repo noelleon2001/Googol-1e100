@@ -13,6 +13,7 @@ import 'ui/map_view.dart';
 import 'ui/object_detector_view.dart';
 import 'ui/about.dart';
 import 'ui/game_view.dart';
+import 'dart:developer' as dev;
 
 List<CameraDescription> cameras = [];
 
@@ -26,11 +27,25 @@ Future<void> main() async {
   cameras = await availableCameras();
   await dotenv.load(fileName: ".env");
 
-  const modelName = 'adam_metadata';
-  final response =
-      await FirebaseObjectDetectorModelManager().downloadModel(modelName);
-  print("Downloaded: $response");
+  // const modelName = 'adam_metadata';
+  //
+  // final response =
+  //     await FirebaseObjectDetectorModelManager().downloadModel(modelName);
+  // print("Downloaded: $response");
+
+  await downloadModels();
   runApp(const MyApp());
+}
+
+
+Future<void> downloadModels() async{
+  const List<String> models = ['adam_metadata', 'recyclable-organic'];
+
+  models.forEach((modelName) async {
+    final response = await FirebaseObjectDetectorModelManager().downloadModel(modelName);
+    dev.log("Model $modelName downloaded: $response");
+  });
+
 }
 
 /*High level App widget*/
