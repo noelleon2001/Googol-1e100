@@ -78,7 +78,7 @@ class _HomeViewState extends State<HomeView> {
       {
         "title": "Classify Images",
         "text":
-            "Help to classify waste and verify images to improve the model!",
+            "Classify and verify images to improve our model!",
         "page": 3,
         "icon": Icons.add_a_photo,
         "color": Color.fromRGBO(16, 200, 136, 1),
@@ -256,6 +256,7 @@ class _HomeViewState extends State<HomeView> {
                         ],
                       ))),
               const SizedBox(height: 10),
+              Text('Our features:', style: TextStyle(fontWeight: FontWeight.w400,fontSize: 16)),
               Expanded(
                   child: Row(
                 children: [
@@ -295,8 +296,7 @@ class _HomeViewState extends State<HomeView> {
                                             buttonText['title'].toString(),
                                             textAlign: TextAlign.center,
                                             style: TextStyle(
-                                                fontSize: 17.5,
-                                                fontWeight: FontWeight.bold))),
+                                                fontSize: 17.5))),
                                     // Text(buttonText['text'].toString()),
                                   ],
                                 )),

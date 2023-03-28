@@ -106,7 +106,7 @@ class GameViewState extends State<GameView> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-          title: const Text('Contribute'),
+          title: const Text('Capture Image'),
           actions: [
             Padding(
               padding: EdgeInsets.only(right: 20.0),
@@ -527,7 +527,7 @@ Widget _helpDialog(BuildContext context) {
       mainAxisSize: MainAxisSize.min,
       crossAxisAlignment: CrossAxisAlignment.start,
       children: <Widget>[
-        Text("This is a page where you can contribute by capturing an image, classify it, and upload to our database.\n\nYour images will be used to train and fine-tune our model or help our developers that needs it.\n\nFollow the 3 steps below to get started:\n\n1) Click the button with camera icon to capture an image with a trash.\n\n2) Click the menu button.\n\n3) Classify the trash with the options given, and confirm your choice.")
+        Text("This is a page where you can contribute by capturing an image, classify it, and it upload to our database.\n\nYour images will be used to train and fine-tune our model or help our developers that need it.\n\nFollow the 3 steps below to get started:\n\n1) Click the button with camera icon to capture an image with a trash.\n\n2) Click the menu button.\n\n3) Classify the trash with the options given, and confirm your choice.")
       ],
     ),
     actions: <Widget>[
