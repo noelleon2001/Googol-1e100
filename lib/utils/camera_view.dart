@@ -214,13 +214,23 @@ class _CameraViewState extends State<CameraView> {
           SizedBox(
               width: 200,
               child: ElevatedButton(
-                child: Text('From gallery'),
+                child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      SizedBox(width: 30, child: Icon(Icons.photo, size: 17)),
+                      const Text('From gallery')
+                    ]),
                 onPressed: () => _getImage(ImageSource.gallery),
               )),
           SizedBox(
             width: 200,
             child: ElevatedButton(
-              child: const Text('Take a picture'),
+                child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      SizedBox(width: 30, child: Icon(Icons.camera, size: 17)),
+                      const Text('Take a picture')
+                    ]),
               onPressed: () => _getImage(ImageSource.camera),
             ),
           ),
