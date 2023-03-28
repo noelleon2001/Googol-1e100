@@ -23,7 +23,7 @@ class SelectViewState extends State<SelectView> {
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             ElevatedButton(
-              child: const Text('Captures images'),
+              child: const Text('Capture images'),
               onPressed: ()
               // async {
               //   await Navigator.of(context).push(
