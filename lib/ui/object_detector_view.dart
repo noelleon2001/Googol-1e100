@@ -9,14 +9,14 @@ import 'package:path_provider/path_provider.dart';
 import '../utils/camera_view.dart';
 import '../painters/object_detector_painter.dart';
 
-const List<Widget> modelNames = <Widget>[
-  Text('Recyclable'),
-  Text('Classification'),
+/* Model icons to be displayed */
+const List<Widget> modelIcons = <Widget>[
+  Icon(Icons.recycling),
+  Icon(Icons.sort),
 ];
 
 class ObjectDetectorView extends StatefulWidget {
   const ObjectDetectorView({Key? key}) : super(key: key);
-
   static const List<String> modelOptions = ['recyclable-organic', 'adam_metadata'];
 
   @override
@@ -33,11 +33,9 @@ class _ObjectDetectorViewState extends State<ObjectDetectorView> {
   String currentModel = ObjectDetectorView.modelOptions.first;
   final List<bool> _selectedModels = <bool>[true, false];
 
-
   @override
   void initState() {
     super.initState();
-
     _initializeDetector(DetectionMode.stream);
   }
 
@@ -51,42 +49,19 @@ class _ObjectDetectorViewState extends State<ObjectDetectorView> {
   @override
   Widget build(BuildContext context) {
 
-    return Stack(
-      children: [
-        CameraView(
-        title: 'Waste Classifier',
-        customPaint: _customPaint,
-        text: _text,
-        onImage: (inputImage) {
-          processImage(inputImage);
-        },
-        onScreenModeChanged: _onScreenModeChanged,
-        initialDirection: CameraLensDirection.back,
-      ),
-        Container(
-          padding: EdgeInsets.symmetric(vertical: 3, horizontal: 15),
-          decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(7)
-          ),
-          child: ToggleButtons(
-              isSelected: _selectedModels,
-              onPressed: (int index) {
-                setState(() {
-                  // The button that is tapped is set to true, and the others to false.
-                  for (int i = 0; i < _selectedModels.length; i++) {
-                    _selectedModels[i] = i == index;
-                  }
-                });
-              },
-              borderRadius: const BorderRadius.all(Radius.circular(8)),
-              selectedBorderColor: Colors.green[700],
-              children: modelNames
-          ),
-        )
-    ]
-    );
-
+    return CameraView(
+          title: 'Waste Classifier',
+          customPaint: _customPaint,
+          text: _text,
+          onImage: (inputImage) {
+            processImage(inputImage);
+          },
+          onScreenModeChanged: _onScreenModeChanged,
+          initialDirection: CameraLensDirection.back,
+          selectionWidgets: modelIcons,
+          selectionOptions: _selectedModels,
+          onSwitch: switchModel
+        );
   }
 
   void switchModel(){

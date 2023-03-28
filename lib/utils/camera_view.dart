@@ -11,6 +11,7 @@ import '../main.dart';
 enum ScreenMode { liveFeed, gallery }
 
 class CameraView extends StatefulWidget {
+
   CameraView(
       {Key? key,
         required this.title,
@@ -18,7 +19,11 @@ class CameraView extends StatefulWidget {
         this.text,
         required this.onImage,
         this.onScreenModeChanged,
-        this.initialDirection = CameraLensDirection.back})
+        this.selectionWidgets,
+        this.selectionOptions,
+        this.onSwitch,
+        this.initialDirection = CameraLensDirection.back,
+      })
       : super(key: key);
 
   final String title;
@@ -27,6 +32,9 @@ class CameraView extends StatefulWidget {
   final Function(InputImage inputImage) onImage;
   final Function(ScreenMode mode)? onScreenModeChanged;
   final CameraLensDirection initialDirection;
+  final List<Widget>? selectionWidgets;
+  final List<bool>? selectionOptions;
+  final Function()? onSwitch;
 
   @override
   State<CameraView> createState() => _CameraViewState();
@@ -42,6 +50,7 @@ class _CameraViewState extends State<CameraView> {
   double zoomLevel = 0.0, minZoomLevel = 0.0, maxZoomLevel = 0.0;
   final bool _allowPicker = true;
   bool _changingCameraLens = false;
+
 
   @override
   void initState() {
@@ -133,8 +142,58 @@ class _CameraViewState extends State<CameraView> {
     } else {
       body = _galleryBody();
     }
-    return body;
+    return Stack(
+        children: [
+          body,
+          _toggleButton(),
+        ]
+    );
   }
+
+  Widget _toggleButton(){
+    bool selectionEnabled = widget.selectionOptions !=null && widget.selectionWidgets !=null;
+
+    if (selectionEnabled){
+      return Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Padding(
+            padding: const EdgeInsets.all(15.0),
+            child: Container(
+              decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(6)
+              ),
+              child: ToggleButtons(
+                  isSelected: widget.selectionOptions!,
+                  onPressed: (int index) {
+                  setState(() {
+                      // The button that is tapped is set to true, and the others to false.
+                      for (int i = 0; i < widget.selectionOptions!.length; i++) {
+                        widget.selectionOptions![i] = i == index;
+                      }
+                   });
+                  },
+                  constraints: const BoxConstraints(
+                    minHeight: 40.0,
+                    minWidth: 80.0,
+                  ),
+                  fillColor: Colors.green[200],
+                  color: Colors.green[400],
+                  selectedColor: Colors.white,
+                  borderRadius: const BorderRadius.all(Radius.circular(7)),
+                  selectedBorderColor: Colors.green[700],
+                   children: widget.selectionWidgets!
+                ),
+            ),
+          ),
+        ],
+      );
+    }
+
+    return Container();
+  }
+
 
   Widget _liveFeedBody() {
     if (_controller?.value.isInitialized == false) {
