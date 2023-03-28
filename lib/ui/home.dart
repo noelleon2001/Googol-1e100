@@ -256,7 +256,7 @@ class _HomeViewState extends State<HomeView> {
                         ],
                       ))),
               const SizedBox(height: 10),
-              Text('Our features:', style: TextStyle(fontWeight: FontWeight.w400,fontSize: 16)),
+              Text('Our key features:', style: TextStyle(fontWeight: FontWeight.w400,fontSize: 16)),
               Expanded(
                   child: Row(
                 children: [
