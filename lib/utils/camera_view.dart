@@ -5,6 +5,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:google_mlkit_commons/google_mlkit_commons.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:lottie/lottie.dart';
 
 import '../main.dart';
 
@@ -14,6 +15,7 @@ class CameraView extends StatefulWidget {
 
   CameraView(
       {Key? key,
+
         required this.title,
         required this.customPaint,
         this.text,
@@ -59,13 +61,13 @@ class _CameraViewState extends State<CameraView> {
     _imagePicker = ImagePicker();
 
     if (cameras.any(
-          (element) =>
-      element.lensDirection == widget.initialDirection &&
+      (element) =>
+          element.lensDirection == widget.initialDirection &&
           element.sensorOrientation == 90,
     )) {
       _cameraIndex = cameras.indexOf(
         cameras.firstWhere((element) =>
-        element.lensDirection == widget.initialDirection &&
+            element.lensDirection == widget.initialDirection &&
             element.sensorOrientation == 90),
       );
     } else {
@@ -105,8 +107,8 @@ class _CameraViewState extends State<CameraView> {
                   _mode == ScreenMode.liveFeed
                       ? Icons.photo_library_outlined
                       : (Platform.isIOS
-                      ? Icons.camera_alt_outlined
-                      : Icons.camera),
+                          ? Icons.camera_alt_outlined
+                          : Icons.camera),
                 ),
               ),
             ),
@@ -220,8 +222,8 @@ class _CameraViewState extends State<CameraView> {
             child: Center(
               child: _changingCameraLens
                   ? const Center(
-                child: Text('Changing camera lens'),
-              )
+                      child: Text('Changing camera lens'),
+                    )
                   : CameraPreview(_controller!),
             ),
           ),
@@ -254,40 +256,70 @@ class _CameraViewState extends State<CameraView> {
     return ListView(shrinkWrap: true, children: [
       _image != null
           ? SizedBox(
-        height: 400,
-        width: 400,
-        child: Stack(
-          fit: StackFit.expand,
-          children: <Widget>[
-            Image.file(_image!),
-            if (widget.customPaint != null) widget.customPaint!,
-          ],
-        ),
-      )
-          : const Icon(
-        Icons.image,
-        size: 200,
+              height: 400,
+              width: 400,
+              child: Stack(
+                fit: StackFit.expand,
+                children: <Widget>[
+                  Image.file(_image!),
+                  if (widget.customPaint != null) widget.customPaint!,
+                ],
+              ),
+            )
+          : Lottie.network(
+              "https://assets9.lottiefiles.com/packages/lf20_wvftyebk.json"),
+      SizedBox(height: 20),
+      Column(
+        children: [
+          SizedBox(
+              width: 200,
+              child: ElevatedButton(
+                child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      SizedBox(width: 30, child: Icon(Icons.photo, size: 17)),
+                      const Text('From gallery')
+                    ]),
+                onPressed: () => _getImage(ImageSource.gallery),
+              )),
+          SizedBox(
+            width: 200,
+            child: ElevatedButton(
+                child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      SizedBox(width: 30, child: Icon(Icons.camera, size: 17)),
+                      const Text('Take a picture')
+                    ]),
+              onPressed: () => _getImage(ImageSource.camera),
+            ),
+          ),
+          if (_image != null)
+            Padding(
+              padding: const EdgeInsets.all(15.0),
+              child: Card(
+                  color: Color.fromRGBO(12, 153, 104, 1),
+                  child: Padding(
+                      padding: const EdgeInsets.only(
+                          right: 15.0, left: 15.0, top: 20.0),
+                      child: Column(
+                        children: [
+                          Text('Image details',
+                              style: TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 20,
+                                  color: Colors.white)),
+                          SizedBox(
+                            height: 20,
+                          ),
+                          Text(
+                              '${_path == null ? '' : 'Image path: $_path'}\n\n${widget.text ?? ''}',
+                              style: TextStyle(color: Colors.white)),
+                        ],
+                      ))),
+            )
+        ],
       ),
-      Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 16),
-        child: ElevatedButton(
-          child: Text('From Gallery'),
-          onPressed: () => _getImage(ImageSource.gallery),
-        ),
-      ),
-      Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 16),
-        child: ElevatedButton(
-          child: const Text('Take a picture'),
-          onPressed: () => _getImage(ImageSource.camera),
-        ),
-      ),
-      if (_image != null)
-        Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: Text(
-              '${_path == null ? '' : 'Image path: $_path'}\n\n${widget.text ?? ''}'),
-        ),
     ]);
   }
 
@@ -377,19 +409,19 @@ class _CameraViewState extends State<CameraView> {
     final bytes = allBytes.done().buffer.asUint8List();
 
     final Size imageSize =
-    Size(image.width.toDouble(), image.height.toDouble());
+        Size(image.width.toDouble(), image.height.toDouble());
 
     final camera = cameras[_cameraIndex];
     final imageRotation =
-    InputImageRotationValue.fromRawValue(camera.sensorOrientation);
+        InputImageRotationValue.fromRawValue(camera.sensorOrientation);
     if (imageRotation == null) return;
 
     final inputImageFormat =
-    InputImageFormatValue.fromRawValue(image.format.raw);
+        InputImageFormatValue.fromRawValue(image.format.raw);
     if (inputImageFormat == null) return;
 
     final planeData = image.planes.map(
-          (Plane plane) {
+      (Plane plane) {
         return InputImagePlaneMetadata(
           bytesPerRow: plane.bytesPerRow,
           height: plane.height,
@@ -406,7 +438,7 @@ class _CameraViewState extends State<CameraView> {
     );
 
     final inputImage =
-    InputImage.fromBytes(bytes: bytes, inputImageData: inputImageData);
+        InputImage.fromBytes(bytes: bytes, inputImageData: inputImageData);
 
     widget.onImage(inputImage);
   }

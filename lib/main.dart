@@ -9,6 +9,7 @@ import 'package:persistent_bottom_nav_bar/persistent_tab_view.dart';
 
 import 'package:google_fonts/google_fonts.dart';
 
+import 'ui/home.dart';
 import 'ui/map_view.dart';
 import 'ui/object_detector_view.dart';
 import 'ui/about.dart';
@@ -58,7 +59,7 @@ class MyApp extends StatelessWidget {
       title: 'BinBrain',
       theme: ThemeData(
         colorScheme: ColorScheme.fromSwatch().copyWith(
-          primary: Color(0xFF0C9968),
+          primary: Color.fromRGBO(12, 153, 104, 1),
           secondary: Color.fromRGBO(154, 169, 166, 1),
         ), 
         textTheme: GoogleFonts.robotoTextTheme(Theme.of(context).textTheme),
@@ -82,12 +83,11 @@ class _NavigationBarWidgetState extends State<NavigationBarWidget> {
 
   late PersistentTabController _controller;
 
-  static const List<Widget> _widgetOptions = <Widget>[
-    ObjectDetectorView(),
-    MapView(),
-    SelectView(),
-    AboutView()
-  ];
+  void _changePage (int index) {
+    setState(() {
+      selectedIndex = index;
+    });
+  }
 
   void _onItemTapped(int index) async {
     setState(() {
@@ -108,6 +108,14 @@ class _NavigationBarWidgetState extends State<NavigationBarWidget> {
 
   @override
   Widget build(BuildContext context) {
+    final List<Widget> _widgetOptions = <Widget>[
+      HomeView(buttonHandler: _changePage),
+      ObjectDetectorView(),
+      MapView(),
+      SelectView(),
+      AboutView()
+    ];
+
     return Scaffold(
       body: Center(
         child: _switch == true ? CircularProgressIndicator() : _widgetOptions.elementAt(selectedIndex),
@@ -132,17 +140,21 @@ class _NavigationBarWidgetState extends State<NavigationBarWidget> {
                 label: 'Home',
               ),
               BottomNavigationBarItem(
-                icon: Icon(selectedIndex == 1 ? Icons.map : Icons.map_outlined),
+                icon: Icon(selectedIndex == 1 ? Icons.camera : Icons.camera_outlined),
+                label: 'Classify',
+              ),
+              BottomNavigationBarItem(
+                icon: Icon(selectedIndex == 2 ? Icons.map : Icons.map_outlined),
                 label: 'Map',
               ),
               BottomNavigationBarItem(
-                icon: Icon(selectedIndex == 2 ? Icons.add_a_photo : Icons.add_a_photo_outlined),
+                icon: Icon(selectedIndex == 3 ? Icons.add_a_photo : Icons.add_a_photo_outlined),
                 label: 'Game',
               ),
-              BottomNavigationBarItem(
-                icon: Icon(selectedIndex == 3 ? Icons.info : Icons.info_outline),
-                label: 'About',
-              ),
+              // BottomNavigationBarItem(
+              //   icon: Icon(selectedIndex == 4 ? Icons.info : Icons.info_outline),
+              //   label: 'About',
+              // ),
             ],
             currentIndex: selectedIndex,
             unselectedItemColor: Colors.grey[500],
@@ -154,12 +166,4 @@ class _NavigationBarWidgetState extends State<NavigationBarWidget> {
       )
     );
   }
-  List<Widget> _buildScreens() {
-      return [
-        const ObjectDetectorView(),
-        const MapView(),
-        const SelectView(),
-        const AboutView()
-      ];
-    }
 }

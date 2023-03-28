@@ -62,6 +62,7 @@ class _ObjectDetectorViewState extends State<ObjectDetectorView> {
           selectionOptions: _selectedModels,
           onSwitch: switchModel
         );
+
   }
 
   void switchModel(){

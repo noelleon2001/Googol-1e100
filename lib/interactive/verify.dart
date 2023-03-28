@@ -115,7 +115,7 @@ class VerifyViewState extends State<VerifyView> {
   Widget build(BuildContext context){
     return Scaffold(
         appBar: AppBar(
-          title: const Text('Verify the image'),
+          title: const Text('Verify Images'),
         ),
         body: SafeArea(
           child: Padding(
