@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:flutter_flip_view/flutter_flip_view.dart';
+import 'package:flip_card/flip_card.dart';
 
 import 'package:http/http.dart' as http;
 import 'dart:developer' as dev;
@@ -65,17 +65,23 @@ class _HomeViewState extends State<HomeView> {
         "title": "Object Detector",
         "text": "Determine type of wastes using the camera",
         "page": 1,
+        "icon": Icons.camera,
+        "color": Color.fromRGBO(16, 200, 136, 1),
       },
       {
         "title": "Map",
         "text": "View important locations on the map",
         "page": 2,
+        "icon": Icons.map,
+        "color": Color.fromRGBO(16, 200, 136, 1),
       },
       {
         "title": "Classify Images",
         "text":
-            "Help to classify waste and verify our images and improve our model!",
+            "Help to classify waste and verify images to improve the model!",
         "page": 3,
+        "icon": Icons.add_a_photo,
+        "color": Color.fromRGBO(16, 200, 136, 1),
       },
     ];
     return Scaffold(
@@ -255,33 +261,82 @@ class _HomeViewState extends State<HomeView> {
                 children: [
                   for (var buttonText in _buttonTexts)
                     Expanded(
-                      child: Card(
-                        clipBehavior: Clip.hardEdge,
-                        child: InkWell(
-                          splashColor: Colors.blue.withAlpha(30),
-                          onTap: () {
-                            widget.buttonHandler(
-                                int.parse(buttonText['page'].toString()));
-                          },
-                          child: Padding(
-                              padding: EdgeInsets.all(10),
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  SizedBox(
-                                      height: 45,
-                                      child: Text(
-                                          buttonText['title'].toString(),
-                                          style: TextStyle(
-                                              fontSize: 17.5,
-                                              fontWeight: FontWeight.bold))),
-                                  Text(buttonText['text'].toString()),
-                                  // Icon(Icons.camera, color: Colors.grey)
-                                ],
-                              )),
+                        child: FlipCard(
+                      fill: Fill
+                          .fillBack, // Fill the back side of the card to make in the same size as the front.
+                      direction: FlipDirection.HORIZONTAL, // default
+                      side: CardSide.FRONT, // The side to initially display.
+                      front: Container(
+                        child: Card(
+                          clipBehavior: Clip.hardEdge,
+                          color: Colors.grey.shade100,
+                          child: InkWell(
+                            splashColor: Colors.blue.withAlpha(30),
+                            // onTap: () {
+                            //   widget.buttonHandler(
+                            //       int.parse(buttonText['page'].toString()));
+                            // },
+                            child: Padding(
+                                padding: EdgeInsets.all(10),
+                                child: Column(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  crossAxisAlignment: CrossAxisAlignment.center,
+                                  children: [
+                                    SizedBox(
+                                        height: 60,
+                                        child: Center(
+                                          child: Icon(
+                                              size: 35,
+                                              buttonText['icon'] as IconData?,
+                                              color: buttonText['color'] as Color?),
+                                        )),
+                                    Center(
+                                        child: Text(
+                                            buttonText['title'].toString(),
+                                            textAlign: TextAlign.center,
+                                            style: TextStyle(
+                                                fontSize: 17.5,
+                                                fontWeight: FontWeight.bold))),
+                                    // Text(buttonText['text'].toString()),
+                                  ],
+                                )),
+                          ),
                         ),
                       ),
-                    ),
+                      back: Container(
+                        child: Card(
+                          clipBehavior: Clip.hardEdge,
+                          color: Colors.grey.shade100,
+                          child: InkWell(
+                            splashColor: Colors.blue.withAlpha(30),
+                            child: Padding(
+                                padding: EdgeInsets.all(10),
+                                child: Column(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  crossAxisAlignment: CrossAxisAlignment.center,
+                                  children: [
+                                    Center(
+                                        child: Text(
+                                            buttonText['text'].toString(),
+                                            textAlign: TextAlign.center)),
+                                    TextButton(
+                                        style: TextButton.styleFrom(
+                                          foregroundColor: Colors.white,
+                                          backgroundColor: Colors.grey.shade700,
+                                          padding: EdgeInsets.zero,
+                                          minimumSize: Size(50, 30),
+                                        ),
+                                        onPressed: () {
+                                          widget.buttonHandler(int.parse(
+                                              buttonText['page'].toString()));
+                                        },
+                                        child: Text('Go'))
+                                  ],
+                                )),
+                          ),
+                        ),
+                      ),
+                    )),
                 ],
               ))
             ]))

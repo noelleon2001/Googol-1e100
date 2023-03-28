@@ -74,6 +74,7 @@ dependencies:
   google_fonts: ^4.0.3
   custom_info_window: ^1.0.1
   flutter_svg: ^1.1.6
+  flip_card: ^0.7.0
 
 dependency_overrides:
   google_maps_flutter:
