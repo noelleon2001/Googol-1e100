@@ -36,7 +36,7 @@ class CameraView extends StatefulWidget {
   final CameraLensDirection initialDirection;
   final List<Widget>? selectionWidgets;
   final List<bool>? selectionOptions;
-  final Function()? onSwitch;
+  final Function(int index)? onSwitch;
 
   @override
   State<CameraView> createState() => _CameraViewState();
@@ -169,6 +169,7 @@ class _CameraViewState extends State<CameraView> {
               child: ToggleButtons(
                   isSelected: widget.selectionOptions!,
                   onPressed: (int index) {
+                    widget.onSwitch!(index);
                   setState(() {
                       // The button that is tapped is set to true, and the others to false.
                       for (int i = 0; i < widget.selectionOptions!.length; i++) {
