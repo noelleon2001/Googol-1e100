@@ -255,6 +255,7 @@ class _CameraViewState extends State<CameraView> {
 
   Widget _galleryBody() {
     return ListView(shrinkWrap: true, children: [
+      SizedBox(height: 80),
       _image != null
           ? SizedBox(
               height: 400,
@@ -267,8 +268,8 @@ class _CameraViewState extends State<CameraView> {
                 ],
               ),
             )
-          : Lottie.network(
-              "https://assets9.lottiefiles.com/packages/lf20_wvftyebk.json"),
+          : Lottie.asset(
+              "assets/detection.json"),
       SizedBox(height: 20),
       Column(
         children: [
