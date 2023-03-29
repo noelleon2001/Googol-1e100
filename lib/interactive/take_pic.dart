@@ -288,7 +288,7 @@ class DisplayPictureScreenState extends State<DisplayPictureScreen> {
 
     // Generate random file name
     final imageName = '${DateTime.now().millisecondsSinceEpoch}-${path.basename(widget.imagePath)}';
-    final imagePath = 'dataset/$fileLocation/$imageName';
+    final imagePath = 'dataset/$imageName';
     final imageFile = File(widget.imagePath);
 
     // Create a reference to the Firebase Storage bucket
