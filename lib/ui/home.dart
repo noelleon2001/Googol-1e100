@@ -23,6 +23,8 @@ class _HomeViewState extends State<HomeView> {
   String? data;
   String? key;
 
+  bool isLoaded = false;
+
   int _uploaded = 0;
   int _verified = 0;
 
@@ -33,16 +35,17 @@ class _HomeViewState extends State<HomeView> {
     fetchData();
   }
 
-  void getUserStats() async{
+  void getUserStats() async {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
 
-    if (prefs.containsKey('upload')){
+    if (prefs.containsKey('upload')) {
       _uploaded = prefs.getInt('upload')!;
     }
 
-    if (prefs.containsKey('verify')){
+    if (prefs.containsKey('verify')) {
       _verified = prefs.getInt('verify')!;
     }
+    isLoaded = true;
   }
 
   void fetchData() async {
@@ -65,6 +68,9 @@ class _HomeViewState extends State<HomeView> {
     int index_min = 2;
     int index_max = 7;
     int index = index_min + rnd.nextInt(index_max - index_min);
+    if (index == 3) {
+      index = 2;
+    }
 
     var key_values = result.keys.elementAt(index).split('_');
 
@@ -95,8 +101,7 @@ class _HomeViewState extends State<HomeView> {
       },
       {
         "title": "Classify Images",
-        "text":
-            "Classify and verify images to improve our model!",
+        "text": "Classify and verify images to improve our model!",
         "page": 3,
         "icon": Icons.add_a_photo,
         "color": Color.fromRGBO(16, 200, 136, 1),
@@ -174,21 +179,35 @@ class _HomeViewState extends State<HomeView> {
                                     style:
                                         TextStyle(color: Colors.grey.shade700)),
                                 const SizedBox(height: 7.5),
-                                Text('$_uploaded objects',
-                                    style: const TextStyle(
-                                        fontSize: 20,
-                                        fontWeight: FontWeight.bold)),
-                                const SizedBox(height: 2.5),
-                                Row(
-                                  children: const [
-                                    Icon(
-                                      Icons.arrow_drop_up,
-                                      color: Colors.green,
-                                    ),
-                                    Text("24% vs avg",
-                                        style: TextStyle(color: Colors.green)),
-                                  ],
-                                )
+                                isLoaded
+                                    ? Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: [
+                                          Text('$_uploaded objects',
+                                              style: const TextStyle(
+                                                  fontSize: 20,
+                                                  fontWeight: FontWeight.bold)),
+                                          const SizedBox(height: 2.5),
+                                          Row(
+                                            children: const [
+                                              Icon(
+                                                Icons.arrow_drop_up,
+                                                color: Colors.green,
+                                              ),
+                                              Text("24% vs avg",
+                                                  style: TextStyle(
+                                                      color: Colors.green)),
+                                            ],
+                                          )
+                                        ],
+                                      )
+                                    : Padding(
+                                        padding: EdgeInsets.all(7.5),
+                                        child: Center(
+                                            child: CircularProgressIndicator(
+                                          strokeWidth: 2.0,
+                                        )))
                               ],
                             ))),
                   ),
@@ -212,21 +231,35 @@ class _HomeViewState extends State<HomeView> {
                                     style:
                                         TextStyle(color: Colors.grey.shade700)),
                                 const SizedBox(height: 7.5),
-                                Text('$_verified images',
-                                    style: const TextStyle(
-                                        fontSize: 20,
-                                        fontWeight: FontWeight.bold)),
-                                const SizedBox(height: 2.5),
-                                Row(
-                                  children: const [
-                                    Icon(
-                                      Icons.arrow_drop_down,
-                                      color: Colors.red,
-                                    ),
-                                    Text("12% vs avg",
-                                        style: TextStyle(color: Colors.red)),
-                                  ],
-                                )
+                                isLoaded
+                                    ? Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: [
+                                            Text('$_verified images',
+                                                style: const TextStyle(
+                                                    fontSize: 20,
+                                                    fontWeight:
+                                                        FontWeight.bold)),
+                                            const SizedBox(height: 2.5),
+                                            Row(
+                                              children: const [
+                                                Icon(
+                                                  Icons.arrow_drop_down,
+                                                  color: Colors.red,
+                                                ),
+                                                Text("12% vs avg",
+                                                    style: TextStyle(
+                                                        color: Colors.red)),
+                                              ],
+                                            )
+                                          ])
+                                    : Padding(
+                                        padding: EdgeInsets.all(7.5),
+                                        child: Center(
+                                            child: CircularProgressIndicator(
+                                          strokeWidth: 2.0,
+                                        )))
                               ],
                             ))),
                   ),
@@ -259,7 +292,9 @@ class _HomeViewState extends State<HomeView> {
                           const SizedBox(height: 7.5),
                           data != null
                               ? Text(
-                                  'In ${year}, a total of ${data} tonnes of rubbish was collected from ${key}!',
+                                  key == null
+                                      ? data!
+                                      : 'In ${year}, a total of ${data} tonnes of rubbish was collected from ${key}!',
                                   style: const TextStyle(
                                       color: Colors.white, fontSize: 15),
                                 )
@@ -274,7 +309,8 @@ class _HomeViewState extends State<HomeView> {
                         ],
                       ))),
               const SizedBox(height: 10),
-              Text('Our key features:', style: TextStyle(fontWeight: FontWeight.w400,fontSize: 16)),
+              Text('Our key features:',
+                  style: TextStyle(fontWeight: FontWeight.w400, fontSize: 16)),
               Expanded(
                   child: Row(
                 children: [
@@ -307,14 +343,14 @@ class _HomeViewState extends State<HomeView> {
                                           child: Icon(
                                               size: 35,
                                               buttonText['icon'] as IconData?,
-                                              color: buttonText['color'] as Color?),
+                                              color: buttonText['color']
+                                                  as Color?),
                                         )),
                                     Center(
                                         child: Text(
                                             buttonText['title'].toString(),
                                             textAlign: TextAlign.center,
-                                            style: TextStyle(
-                                                fontSize: 17.5))),
+                                            style: TextStyle(fontSize: 17.5))),
                                     // Text(buttonText['text'].toString()),
                                   ],
                                 )),

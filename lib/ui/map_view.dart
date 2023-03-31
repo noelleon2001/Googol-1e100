@@ -253,112 +253,101 @@ class _MapViewState extends State<MapView> {
                 markerId: MarkerId(place.name),
                 position: place.latLng,
                 onTap: () async {
-                  // check if has photo
-                  setState(() {
-                    isPhoto = place.photoReference != null ? true : false;
-                  });
-
-                  // for offseting the camera to make space for info window
-                  ScreenCoordinate screenCoordinate =
-                      await mapController.getScreenCoordinate(place.latLng);
-                  LatLng newCameraPosition = await mapController.getLatLng(
-                    ScreenCoordinate(
-                      x: screenCoordinate.x,
-                      y: isPhoto
-                          ? screenCoordinate.y - 550
-                          : screenCoordinate.y - 300,
-                    ),
-                  );
-                  mapController
-                      .animateCamera(CameraUpdate.newLatLng(newCameraPosition));
-
-                  // add info window
-                  _customInfoWindowController.addInfoWindow!(
-                      Container(
-                        height: 300,
-                        width: 200,
-                        decoration: BoxDecoration(
-                            color: Colors.white,
-                            border: Border.all(color: Colors.grey),
-                            borderRadius: BorderRadius.circular(10)),
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.start,
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            place.photoReference != null
-                                ? Container(
-                                    height: 100,
-                                    width: 300,
-                                    decoration: BoxDecoration(
-                                      image: DecorationImage(
-                                          image: getImage(place.photoReference),
-                                          fit: BoxFit.fitWidth,
-                                          filterQuality: FilterQuality.high),
-                                      borderRadius: BorderRadius.vertical(
-                                          top: Radius.circular(10)),
-                                    ))
-                                : Container(width: 0, height: 0),
-                            Padding(
-                                padding: EdgeInsets.only(
-                                    top: 10.0, left: 10.0, right: 10.0),
-                                child: Column(
-                                  mainAxisAlignment: MainAxisAlignment.start,
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Row(
-                                      children: [
-                                        SizedBox(
-                                            width: 220,
-                                            child: Text(place.name,
-                                                style: TextStyle(
-                                                    fontWeight:
-                                                        FontWeight.bold),
-                                                overflow: TextOverflow.ellipsis,
-                                                maxLines: 2,
-                                                softWrap: true)),
-                                        const Spacer(),
-                                        Text(place.rating.toString()),
-                                        Icon(Icons.star_rounded,
-                                            color: Colors.amberAccent)
-                                      ],
-                                    ),
-                                    SizedBox(height: 2.5),
-                                    place.businessStatus == 'OPERATIONAL'
-                                        ? Text(
-                                            place.openNow == true
-                                                ? 'Open Now'
-                                                : 'Closed',
-                                            style: TextStyle(
-                                                color: place.openNow == true
-                                                    ? Colors.green
-                                                    : Colors.red,
-                                                fontWeight: FontWeight.bold),
-                                          )
-                                        : Text(
-                                            place.businessStatus ==
-                                                    'CLOSED_TEMPORARILY'
-                                                ? 'Temporarily Closed'
-                                                : 'Permanently Closed',
-                                            style: TextStyle(
-                                                color: place.businessStatus ==
-                                                        'CLOSED_TEMPORARILY'
-                                                    ? Colors.grey
-                                                    : Colors.red)),
-                                    SizedBox(height: 5.0),
-                                    Text(place.formattedAddress,
-                                        overflow: TextOverflow.ellipsis,
-                                        maxLines: 3,
-                                        softWrap: true),
-                                  ],
-                                ))
-                          ],
-                        ),
-                      ),
-                      place.latLng);
+                  addInfoWindowOnMarkers(
+                      place.photoReference,
+                      place.latLng,
+                      place.name,
+                      place.rating.toString(),
+                      place.openNow,
+                      place.formattedAddress);
                 }))
           });
     }
     setState(() => {this.markers = markers});
+  }
+
+  void addInfoWindowOnMarkers(
+      photoReference, latLng, name, rating, openNow, formattedAddress) async {
+    // check if has photo
+    setState(() {
+      isPhoto = photoReference != null ? true : false;
+    });
+
+    // for offseting the camera to make space for info window
+    ScreenCoordinate screenCoordinate =
+        await mapController.getScreenCoordinate(latLng);
+    LatLng newCameraPosition = await mapController.getLatLng(
+      ScreenCoordinate(
+        x: screenCoordinate.x,
+        y: isPhoto ? screenCoordinate.y - 550 : screenCoordinate.y - 300,
+      ),
+    );
+    mapController.animateCamera(CameraUpdate.newLatLng(newCameraPosition));
+
+    // add info window
+    _customInfoWindowController.addInfoWindow!(
+        Container(
+          height: 350,
+          width: 200,
+          decoration: BoxDecoration(
+              color: Colors.white,
+              border: Border.all(color: Colors.grey),
+              borderRadius: BorderRadius.circular(10)),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.start,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              photoReference != null
+                  ? Container(
+                      height: 100,
+                      width: 300,
+                      decoration: BoxDecoration(
+                        image: DecorationImage(
+                            image: getImage(photoReference),
+                            fit: BoxFit.fitWidth,
+                            filterQuality: FilterQuality.high),
+                        borderRadius:
+                            BorderRadius.vertical(top: Radius.circular(10)),
+                      ))
+                  : Container(width: 0, height: 0),
+              Padding(
+                  padding: EdgeInsets.only(top: 10.0, left: 10.0, right: 10.0),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        children: [
+                          SizedBox(
+                              width: 220,
+                              child: Text(name,
+                                  style: TextStyle(fontWeight: FontWeight.bold),
+                                  overflow: TextOverflow.ellipsis,
+                                  maxLines: 2,
+                                  softWrap: true)),
+                          const Spacer(),
+                          Text(rating),
+                          Icon(Icons.star_rounded, color: Colors.amberAccent)
+                        ],
+                      ),
+                      SizedBox(height: 2.5),
+                      Text(
+                        openNow == true ? 'Open Now' : 'Closed',
+                        style: TextStyle(
+                            color: openNow == true ? Colors.green : Colors.red,
+                            fontWeight: FontWeight.bold),
+                      ),
+                      SizedBox(height: 5.0),
+                      Text(formattedAddress,
+                          overflow: TextOverflow.ellipsis,
+                          maxLines: 3,
+                          softWrap: true),
+                    ],
+                  ))
+            ],
+          ),
+        ),
+        latLng);
   }
 
   ImageProvider<Object> getImage(photoReference) {
@@ -368,6 +357,7 @@ class _MapViewState extends State<MapView> {
   }
 
   Future<void> _handleSearch() async {
+    _customInfoWindowController.hideInfoWindow!();
     gs.Prediction? p = await PlacesAutocomplete.show(
         context: context,
         apiKey: dotenv.env['GMAP_KEY']!,
@@ -403,20 +393,28 @@ class _MapViewState extends State<MapView> {
 
   Future<void> markSearchLocation(
       gs.Prediction p, ScaffoldState? currentState) async {
-    gs.PlacesDetailsResponse detail =
-        await places.getDetailsByPlaceId(p.placeId!);
+    gs.PlacesDetailsResponse res = await places.getDetailsByPlaceId(p.placeId!);
 
-    final lat = detail.result.geometry!.location.lat;
-    final lng = detail.result.geometry!.location.lng;
+    gs.PlaceDetails details = res.result;
+
+    final lat = res.result.geometry!.location.lat;
+    final lng = res.result.geometry!.location.lng;
 
     markers.clear();
     markers.add(Marker(
         markerId: MarkerId("0"),
         position: LatLng(lat, lng),
-        infoWindow: InfoWindow(
-          title: detail.result.name,
-          snippet: detail.result.formattedAddress,
-        )));
+        onTap: () {
+          addInfoWindowOnMarkers(
+              details.photos != null ? details.photos[0].photoReference : null,
+              LatLng(lat, lng),
+              details.name,
+              details.rating.toString(),
+              details.openingHours != null
+                  ? details.openingHours!.openNow
+                  : null,
+              details.formattedAddress);
+        }));
 
     setState(() {});
 
@@ -425,7 +423,6 @@ class _MapViewState extends State<MapView> {
   }
 
   void fetchHeatmaps() {
-
     setState(() {
       heatmaps.add(
         Heatmap(

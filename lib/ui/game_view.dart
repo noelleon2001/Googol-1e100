@@ -24,8 +24,8 @@ class SelectViewState extends State<SelectView> {
           mainAxisAlignment: MainAxisAlignment.center,
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            Lottie.network(
-                "https://assets7.lottiefiles.com/packages/lf20_qaemdbel.json"),
+            Lottie.asset(
+                "assets/recycle.json"),
             SizedBox(
               height: 20,
             ),
