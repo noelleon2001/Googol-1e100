@@ -100,7 +100,7 @@ class _HomeViewState extends State<HomeView> {
         "color": Color.fromRGBO(16, 200, 136, 1),
       },
       {
-        "title": "Classify Images",
+        "title": "Contribute",
         "text": "Classify and verify images to improve our model!",
         "page": 3,
         "icon": Icons.add_a_photo,
