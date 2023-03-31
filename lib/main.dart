@@ -7,10 +7,14 @@ import 'firebase_options.dart';
 import 'package:google_mlkit_object_detection/google_mlkit_object_detection.dart';
 import 'package:persistent_bottom_nav_bar/persistent_tab_view.dart';
 
+import 'package:google_fonts/google_fonts.dart';
+
+import 'ui/home.dart';
 import 'ui/map_view.dart';
 import 'ui/object_detector_view.dart';
 import 'ui/about.dart';
 import 'ui/game_view.dart';
+import 'dart:developer' as dev;
 
 List<CameraDescription> cameras = [];
 
@@ -24,11 +28,25 @@ Future<void> main() async {
   cameras = await availableCameras();
   await dotenv.load(fileName: ".env");
 
-  const modelName = 'adam_metadata';
-  final response =
-      await FirebaseObjectDetectorModelManager().downloadModel(modelName);
-  print("Downloaded: $response");
+  // const modelName = 'adam_metadata';
+  //
+  // final response =
+  //     await FirebaseObjectDetectorModelManager().downloadModel(modelName);
+  // print("Downloaded: $response");
+
+  await downloadModels();
   runApp(const MyApp());
+}
+
+
+Future<void> downloadModels() async{
+  const List<String> models = ['adam_metadata', 'recyclable-organic'];
+
+  models.forEach((modelName) async {
+    final response = await FirebaseObjectDetectorModelManager().downloadModel(modelName);
+    dev.log("Model $modelName downloaded: $response");
+  });
+
 }
 
 /*High level App widget*/
@@ -40,7 +58,11 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'BinBrain',
       theme: ThemeData(
-        primarySwatch: Colors.blue,
+        colorScheme: ColorScheme.fromSwatch().copyWith(
+          primary: Color.fromRGBO(12, 153, 104, 1),
+          secondary: Color.fromRGBO(154, 169, 166, 1),
+        ), 
+        textTheme: GoogleFonts.robotoTextTheme(Theme.of(context).textTheme),
       ),
       home: const NavigationBarWidget(),
       debugShowCheckedModeBanner: false,
@@ -56,9 +78,27 @@ class NavigationBarWidget extends StatefulWidget {
 }
 
 class _NavigationBarWidgetState extends State<NavigationBarWidget> {
+  int selectedIndex = 0;
   bool _switch = false;
 
   late PersistentTabController _controller;
+
+  void _changePage (int index) {
+    setState(() {
+      selectedIndex = index;
+    });
+  }
+
+  void _onItemTapped(int index) async {
+    setState(() {
+      selectedIndex = index;
+      _switch = true;
+    });
+    await Future.delayed(Duration(milliseconds: 500));
+    setState(() {
+      _switch = false;
+    });
+  }
 
   @override
   void initState() {
@@ -68,89 +108,62 @@ class _NavigationBarWidgetState extends State<NavigationBarWidget> {
 
   @override
   Widget build(BuildContext context) {
-    return _switch ? const Scaffold(body: Center(child: CircularProgressIndicator())) : PersistentTabView(
-      context,
-      controller: _controller,
-      screens: _buildScreens(),
-      items: _navBarsItems(),
-      confineInSafeArea: true,
-      backgroundColor: Colors.white, // Default is Colors.white.
-      resizeToAvoidBottomInset: true,
-      hideNavigationBarWhenKeyboardShows:
-      true, // Recommended to set 'resizeToAvoidBottomInset' as true while using this argument. Default is true.
-      decoration: NavBarDecoration(
-        borderRadius: BorderRadius.circular(10.0),
-        colorBehindNavBar: Colors.white,
-      ),
-      popAllScreensOnTapOfSelectedTab: true,
-      popActionScreens: PopActionScreensType.all,
-      itemAnimationProperties: const ItemAnimationProperties(
-        // Navigation Bar's items animation properties.
-        duration: Duration(milliseconds: 200),
-        curve: Curves.ease,
-      ),
-      screenTransitionAnimation: const ScreenTransitionAnimation(
-        // Screen transition animation on change of selected tab.
-        animateTabTransition: true,
-        curve: Curves.ease,
-        duration: Duration(milliseconds: 200),
-      ),
-      navBarStyle: NavBarStyle.style1,
-      onItemSelected: _onItemTapped,
-
-      // Choose the nav bar style with this property.
-    );
-
-
-  }
-
-  void _onItemTapped(int index) async {
-    setState(() {
-      _switch = true;
-    });
-    await Future.delayed(const Duration(milliseconds: 500));
-    setState(() {
-      _switch = false;
-    });
-  }
-
-  List<Widget> _buildScreens() {
-      return [
-        const ObjectDetectorView(),
-        const MapView(),
-        const GameView(),
-        const AboutView()
-      ];
-    }
-
-  List<PersistentBottomNavBarItem> _navBarsItems() {
-    return [
-      PersistentBottomNavBarItem(
-        icon: const Icon(Icons.home),
-        title: ("Home"),
-        activeColorPrimary: Colors.blue,
-        inactiveColorPrimary: Colors.grey,
-      ),
-      PersistentBottomNavBarItem(
-        icon: const Icon(Icons.map),
-        title: ("Map"),
-        activeColorPrimary: Colors.green,
-        inactiveColorPrimary: Colors.grey,
-      ),
-      PersistentBottomNavBarItem(
-        icon: const Icon(Icons.photo_library_sharp),
-        title: ("Photo"),
-        activeColorPrimary: Colors.orangeAccent,
-        inactiveColorPrimary: CupertinoColors.systemGrey,
-      ),
-      PersistentBottomNavBarItem(
-        icon: const Icon(Icons.info),
-        title: ("Info"),
-        activeColorPrimary: Colors.grey,
-        inactiveColorPrimary: CupertinoColors.systemGrey,
-      ),
+    final List<Widget> _widgetOptions = <Widget>[
+      HomeView(buttonHandler: _changePage),
+      ObjectDetectorView(),
+      MapView(),
+      SelectView(),
+      AboutView()
     ];
+
+    return Scaffold(
+      body: Center(
+        child: _switch == true ? CircularProgressIndicator() : _widgetOptions.elementAt(selectedIndex),
+        ),
+      bottomNavigationBar: SizedBox(
+        height: 60,
+        child: Container(
+          decoration: const BoxDecoration(
+            boxShadow: <BoxShadow>[
+              BoxShadow(
+                  color: Color.fromARGB(23, 0, 0, 0),
+                  blurRadius: 50.0,
+              )
+            ],
+          ),
+          child: BottomNavigationBar(
+            backgroundColor: Colors.white,
+            type: BottomNavigationBarType.fixed,
+            items: <BottomNavigationBarItem>[
+              BottomNavigationBarItem(
+                icon: Icon(selectedIndex == 0 ? Icons.home : Icons.home_outlined),
+                label: 'Home',
+              ),
+              BottomNavigationBarItem(
+                icon: Icon(selectedIndex == 1 ? Icons.camera : Icons.camera_outlined),
+                label: 'Classify',
+              ),
+              BottomNavigationBarItem(
+                icon: Icon(selectedIndex == 2 ? Icons.map : Icons.map_outlined),
+                label: 'Map',
+              ),
+              BottomNavigationBarItem(
+                icon: Icon(selectedIndex == 3 ? Icons.add_a_photo : Icons.add_a_photo_outlined),
+                label: 'Game',
+              ),
+              // BottomNavigationBarItem(
+              //   icon: Icon(selectedIndex == 4 ? Icons.info : Icons.info_outline),
+              //   label: 'About',
+              // ),
+            ],
+            currentIndex: selectedIndex,
+            unselectedItemColor: Colors.grey[500],
+            selectedFontSize: 0,
+            unselectedFontSize: 0,
+            onTap: _onItemTapped,
+          ),
+        )
+      )
+    );
   }
-
-
 }

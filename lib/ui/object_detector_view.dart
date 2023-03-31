@@ -9,8 +9,15 @@ import 'package:path_provider/path_provider.dart';
 import '../utils/camera_view.dart';
 import '../painters/object_detector_painter.dart';
 
+/* Model icons to be displayed */
+const List<Widget> modelIcons = <Widget>[
+  Icon(Icons.recycling),
+  Icon(Icons.sort),
+];
+
 class ObjectDetectorView extends StatefulWidget {
   const ObjectDetectorView({Key? key}) : super(key: key);
+  static const List<String> modelOptions = ['recyclable-organic', 'adam_metadata'];
 
   @override
   State<ObjectDetectorView> createState() => _ObjectDetectorViewState();
@@ -23,11 +30,12 @@ class _ObjectDetectorViewState extends State<ObjectDetectorView> {
   CustomPaint? _customPaint;
   String? _text;
 
+  String currentModel = ObjectDetectorView.modelOptions.first;
+  final List<bool> _selectedModels = <bool>[true, false];
 
   @override
   void initState() {
     super.initState();
-
     _initializeDetector(DetectionMode.stream);
   }
 
@@ -42,16 +50,28 @@ class _ObjectDetectorViewState extends State<ObjectDetectorView> {
   Widget build(BuildContext context) {
 
     return CameraView(
-      title: 'Object Detector',
-      customPaint: _customPaint,
-      text: _text,
-      onImage: (inputImage) {
-        processImage(inputImage);
-      },
-      onScreenModeChanged: _onScreenModeChanged,
-      initialDirection: CameraLensDirection.back,
-    );
+          title: 'Waste Classifier',
+          customPaint: _customPaint,
+          text: _text,
+          onImage: (inputImage) {
+            processImage(inputImage);
+          },
+          onScreenModeChanged: _onScreenModeChanged,
+          initialDirection: CameraLensDirection.back,
+          selectionWidgets: modelIcons,
+          selectionOptions: _selectedModels,
+          onSwitch: switchModel
+        );
+
   }
+
+  void switchModel(int index){
+    // _canProcess = false;
+    // _objectDetector.close();
+    currentModel = ObjectDetectorView.modelOptions[index];
+    _initializeDetector(DetectionMode.stream);
+  }
+
 
   void _onScreenModeChanged(ScreenMode mode) {
     switch (mode) {
@@ -68,31 +88,12 @@ class _ObjectDetectorViewState extends State<ObjectDetectorView> {
   void _initializeDetector(DetectionMode mode) async {
     print('Set detector in mode: $mode');
 
-    // uncomment next lines if you want to use the default model
-    // final options = ObjectDetectorOptions(
-    //     mode: mode,
-    //     classifyObjects: true,
-    //     multipleObjects: true);
-    // _objectDetector = ObjectDetector(options: options);
-
-    // uncomment next lines if you want to use a local model
-    // make sure to add tflite model to assets/ml
-    // final path = 'assets/6class/effi.tflite';
-    // final modelPath = await _getModel(path);
-    // final options = LocalObjectDetectorOptions(
-    //   mode: mode,
-    //   modelPath: modelPath,
-    //   classifyObjects: true,
-    //   multipleObjects: true,
-    // );
-    // _objectDetector = ObjectDetector(options: options);
-
     // uncomment next lines if you want to use a remote model
     // make sure to add model to firebase
 
     final options = FirebaseObjectDetectorOptions(
       mode: mode,
-      modelName: 'adam_metadata',
+      modelName: currentModel,
       classifyObjects: true,
       multipleObjects: true,
     );
@@ -132,6 +133,7 @@ class _ObjectDetectorViewState extends State<ObjectDetectorView> {
     }
   }
 
+  /* For local models */
   Future<String> _getModel(String assetPath) async {
     if (io.Platform.isAndroid) {
       return 'flutter_assets/$assetPath';

@@ -5,20 +5,27 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:google_mlkit_commons/google_mlkit_commons.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:lottie/lottie.dart';
 
 import '../main.dart';
 
 enum ScreenMode { liveFeed, gallery }
 
 class CameraView extends StatefulWidget {
+
   CameraView(
       {Key? key,
+
         required this.title,
         required this.customPaint,
         this.text,
         required this.onImage,
         this.onScreenModeChanged,
-        this.initialDirection = CameraLensDirection.back})
+        this.selectionWidgets,
+        this.selectionOptions,
+        this.onSwitch,
+        this.initialDirection = CameraLensDirection.back,
+      })
       : super(key: key);
 
   final String title;
@@ -27,6 +34,9 @@ class CameraView extends StatefulWidget {
   final Function(InputImage inputImage) onImage;
   final Function(ScreenMode mode)? onScreenModeChanged;
   final CameraLensDirection initialDirection;
+  final List<Widget>? selectionWidgets;
+  final List<bool>? selectionOptions;
+  final Function(int index)? onSwitch;
 
   @override
   State<CameraView> createState() => _CameraViewState();
@@ -43,6 +53,7 @@ class _CameraViewState extends State<CameraView> {
   final bool _allowPicker = true;
   bool _changingCameraLens = false;
 
+
   @override
   void initState() {
     super.initState();
@@ -50,13 +61,13 @@ class _CameraViewState extends State<CameraView> {
     _imagePicker = ImagePicker();
 
     if (cameras.any(
-          (element) =>
-      element.lensDirection == widget.initialDirection &&
+      (element) =>
+          element.lensDirection == widget.initialDirection &&
           element.sensorOrientation == 90,
     )) {
       _cameraIndex = cameras.indexOf(
         cameras.firstWhere((element) =>
-        element.lensDirection == widget.initialDirection &&
+            element.lensDirection == widget.initialDirection &&
             element.sensorOrientation == 90),
       );
     } else {
@@ -96,8 +107,8 @@ class _CameraViewState extends State<CameraView> {
                   _mode == ScreenMode.liveFeed
                       ? Icons.photo_library_outlined
                       : (Platform.isIOS
-                      ? Icons.camera_alt_outlined
-                      : Icons.camera),
+                          ? Icons.camera_alt_outlined
+                          : Icons.camera),
                 ),
               ),
             ),
@@ -133,8 +144,59 @@ class _CameraViewState extends State<CameraView> {
     } else {
       body = _galleryBody();
     }
-    return body;
+    return Stack(
+        children: [
+          body,
+          _toggleButton(),
+        ]
+    );
   }
+
+  Widget _toggleButton(){
+    bool selectionEnabled = widget.selectionOptions !=null && widget.selectionWidgets !=null;
+
+    if (selectionEnabled){
+      return Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Padding(
+            padding: const EdgeInsets.all(15.0),
+            child: Container(
+              decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(6)
+              ),
+              child: ToggleButtons(
+                  isSelected: widget.selectionOptions!,
+                  onPressed: (int index) {
+                    widget.onSwitch!(index);
+                  setState(() {
+                      // The button that is tapped is set to true, and the others to false.
+                      for (int i = 0; i < widget.selectionOptions!.length; i++) {
+                        widget.selectionOptions![i] = i == index;
+                      }
+                   });
+                  },
+                  constraints: const BoxConstraints(
+                    minHeight: 40.0,
+                    minWidth: 80.0,
+                  ),
+                  fillColor: Color.fromRGBO(12, 153, 104, 1),
+                  color: Color.fromRGBO(154, 169, 166, 1),
+                  selectedColor: Colors.white,
+                  borderRadius: const BorderRadius.all(Radius.circular(7)),
+                  selectedBorderColor: Color.fromRGBO(12, 153, 104, 1),
+                   children: widget.selectionWidgets!
+                ),
+            ),
+          ),
+        ],
+      );
+    }
+
+    return Container();
+  }
+
 
   Widget _liveFeedBody() {
     if (_controller?.value.isInitialized == false) {
@@ -161,8 +223,8 @@ class _CameraViewState extends State<CameraView> {
             child: Center(
               child: _changingCameraLens
                   ? const Center(
-                child: Text('Changing camera lens'),
-              )
+                      child: Text('Changing camera lens'),
+                    )
                   : CameraPreview(_controller!),
             ),
           ),
@@ -193,42 +255,73 @@ class _CameraViewState extends State<CameraView> {
 
   Widget _galleryBody() {
     return ListView(shrinkWrap: true, children: [
+      SizedBox(height: 80),
       _image != null
           ? SizedBox(
-        height: 400,
-        width: 400,
-        child: Stack(
-          fit: StackFit.expand,
-          children: <Widget>[
-            Image.file(_image!),
-            if (widget.customPaint != null) widget.customPaint!,
-          ],
-        ),
-      )
-          : const Icon(
-        Icons.image,
-        size: 200,
+              height: 400,
+              width: 400,
+              child: Stack(
+                fit: StackFit.expand,
+                children: <Widget>[
+                  Image.file(_image!),
+                  if (widget.customPaint != null) widget.customPaint!,
+                ],
+              ),
+            )
+          : Lottie.asset(
+              "assets/detection.json"),
+      SizedBox(height: 20),
+      Column(
+        children: [
+          SizedBox(
+              width: 200,
+              child: ElevatedButton(
+                child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      SizedBox(width: 30, child: Icon(Icons.photo, size: 17)),
+                      const Text('From gallery')
+                    ]),
+                onPressed: () => _getImage(ImageSource.gallery),
+              )),
+          SizedBox(
+            width: 200,
+            child: ElevatedButton(
+                child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      SizedBox(width: 30, child: Icon(Icons.camera, size: 17)),
+                      const Text('Take a picture')
+                    ]),
+              onPressed: () => _getImage(ImageSource.camera),
+            ),
+          ),
+          if (_image != null)
+            Padding(
+              padding: const EdgeInsets.all(15.0),
+              child: Card(
+                  color: Color.fromRGBO(12, 153, 104, 1),
+                  child: Padding(
+                      padding: const EdgeInsets.only(
+                          right: 15.0, left: 15.0, top: 20.0),
+                      child: Column(
+                        children: [
+                          Text('Image details',
+                              style: TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 20,
+                                  color: Colors.white)),
+                          SizedBox(
+                            height: 20,
+                          ),
+                          Text(
+                              '${_path == null ? '' : 'Image path: $_path'}\n\n${widget.text ?? ''}',
+                              style: TextStyle(color: Colors.white)),
+                        ],
+                      ))),
+            )
+        ],
       ),
-      Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 16),
-        child: ElevatedButton(
-          child: Text('From Gallery'),
-          onPressed: () => _getImage(ImageSource.gallery),
-        ),
-      ),
-      Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 16),
-        child: ElevatedButton(
-          child: const Text('Take a picture'),
-          onPressed: () => _getImage(ImageSource.camera),
-        ),
-      ),
-      if (_image != null)
-        Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: Text(
-              '${_path == null ? '' : 'Image path: $_path'}\n\n${widget.text ?? ''}'),
-        ),
     ]);
   }
 
@@ -318,19 +411,19 @@ class _CameraViewState extends State<CameraView> {
     final bytes = allBytes.done().buffer.asUint8List();
 
     final Size imageSize =
-    Size(image.width.toDouble(), image.height.toDouble());
+        Size(image.width.toDouble(), image.height.toDouble());
 
     final camera = cameras[_cameraIndex];
     final imageRotation =
-    InputImageRotationValue.fromRawValue(camera.sensorOrientation);
+        InputImageRotationValue.fromRawValue(camera.sensorOrientation);
     if (imageRotation == null) return;
 
     final inputImageFormat =
-    InputImageFormatValue.fromRawValue(image.format.raw);
+        InputImageFormatValue.fromRawValue(image.format.raw);
     if (inputImageFormat == null) return;
 
     final planeData = image.planes.map(
-          (Plane plane) {
+      (Plane plane) {
         return InputImagePlaneMetadata(
           bytesPerRow: plane.bytesPerRow,
           height: plane.height,
@@ -347,7 +440,7 @@ class _CameraViewState extends State<CameraView> {
     );
 
     final inputImage =
-    InputImage.fromBytes(bytes: bytes, inputImageData: inputImageData);
+        InputImage.fromBytes(bytes: bytes, inputImageData: inputImageData);
 
     widget.onImage(inputImage);
   }

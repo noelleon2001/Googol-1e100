@@ -30,13 +30,21 @@ class Place{
   final String formattedAddress;
   final String name;
   final LatLng latLng;
-  // double? rating;
+  final String businessStatus;
+  final bool? openNow;
+  final String? photoReference;
+  final String? icon;
+  double? rating;
 
   Place({
     required this.formattedAddress,
     required this.name,
     required this.latLng,
-    // this.rating
+    required this.businessStatus,
+    this.openNow,
+    this.photoReference,
+    this.icon,
+    this.rating
   });
 
   factory Place.fromJson(Map<String, dynamic> json){
@@ -47,9 +55,13 @@ class Place{
 
     return Place(
       formattedAddress: json['formatted_address'],
-      latLng: LatLng(lat!, lng!),
       name: json['name'],
-      // rating: json['rating']
+      latLng: LatLng(lat!, lng!),
+      businessStatus: json['business_status'],
+      openNow: json['opening_hours'] != null ? json['opening_hours']['open_now'] : null,
+      photoReference: json['photos'] != null ? json['photos'][0]['photo_reference'] : null,
+      icon: json['icon'],
+      rating: json['rating'].toDouble(),
     );
   }
 }
