@@ -1,7 +1,7 @@
 
 # Bin Brain: Googol 1e100
 
-BinBrain is an app that leverages artificial intelligence using advanced object detection models to make recycling easier and more accessible for everyone. Developed using Google technologies such as Flutter, Firebase and Google Cloud Storage, Binbrain is a solution targeting to achieve three of the Sustainable Development Goals (SDGs), which are Sustainable Cities and Communities, Responsible Consumption and Production and Life on Land. 
+BinBrain is an app that leverages artificial intelligence using an advanced classification model to make recycling easier and more accessible for everyone. Developed using Google technologies such as Flutter, Firebase and Google Cloud Storage, Binbrain is a solution targeting to achieve three of the Sustainable Development Goals (SDGs), which are Sustainable Cities and Communities, Responsible Consumption and Production and Life on Land. 
 
 ## Getting Started
 ### Initial Setup
@@ -19,7 +19,7 @@ BinBrain is an app that leverages artificial intelligence using advanced object 
 BinBrain consists of four different tabs, Home, Object Detector, Map and Contribute.
 
 - **Home**: View your stats on total classified and verified objects, waste disposal facts and infomation about the other tabs.
-- **Object Detector**: Utilizing an object detection model, use your camera or a picture from your gallery to identify organic or recyclable wastes.
+- **Object Detector**: Utilizing an classification model, use your camera or a picture from your gallery to identify organic or recyclable wastes.
 - **Map**: Find the closest Recycling Centers and Waste Collection for recycling. Also, view a Heatmap visualising the locations of recently classified wastes.
-- **Contribute**: Classify waste images and verify other images to ensure that they are classified properly. These images will be used in our training dataset to further improve our object detection model. 
+- **Contribute**: Classify waste images and verify other images to ensure that they are classified properly. These images will be used in our training dataset to further improve our classification model. 
 
