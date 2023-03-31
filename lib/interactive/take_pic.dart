@@ -139,39 +139,42 @@ class GameViewState extends State<GameView> {
         },
       ),
       ),
-      floatingActionButton: FloatingActionButton(
-        // Provide an onPressed callback.
-        onPressed: () async {
-          // Take the Picture in a try / catch block. If anything goes wrong,
-          // catch the error.
-          try {
-            // Ensure that the camera is initialized.
-            await _initializeControllerFuture;
+      floatingActionButton: Padding(
+        padding: const EdgeInsets.all(20.0),
+        child: FloatingActionButton(
+          // Provide an onPressed callback.
+          onPressed: () async {
+            // Take the Picture in a try / catch block. If anything goes wrong,
+            // catch the error.
+            try {
+              // Ensure that the camera is initialized.
+              await _initializeControllerFuture;
 
-            // Attempt to take a picture and get the file `image`
-            // where it was saved.
-            final image = await _controller.takePicture();
+              // Attempt to take a picture and get the file `image`
+              // where it was saved.
+              final image = await _controller.takePicture();
 
-            if (!mounted) return;
-            location = await _determinePosition();
+              if (!mounted) return;
+              location = await _determinePosition();
 
-            // If the picture was taken, display it on a new screen.
-            await Navigator.of(context).push(
-              MaterialPageRoute(
-                builder: (context) => DisplayPictureScreen(
-                  // Pass the automatically generated path to
-                  // the DisplayPictureScreen widget.
-                  imagePath: image.path,
-                  location: location,
+              // If the picture was taken, display it on a new screen.
+              await Navigator.of(context).push(
+                MaterialPageRoute(
+                  builder: (context) => DisplayPictureScreen(
+                    // Pass the automatically generated path to
+                    // the DisplayPictureScreen widget.
+                    imagePath: image.path,
+                    location: location,
+                  ),
                 ),
-              ),
-            );
-          } catch (e) {
-            // If an error occurs, log the error to the console.
-            print(e);
-          }
-        },
-        child: const Icon(Icons.camera_alt),
+              );
+            } catch (e) {
+              // If an error occurs, log the error to the console.
+              print(e);
+            }
+          },
+          child: const Icon(Icons.camera_alt),
+        ),
       ),
     );
   }
@@ -378,130 +381,109 @@ class DisplayPictureScreenState extends State<DisplayPictureScreen> {
       // The image is stored as a file on the device. Use the `Image.file`
       // constructor with the given path to display the image.
       body: Center(child: Image.file(File(widget.imagePath))),
-      floatingActionButton: SpeedDial( //Speed dial menu
-        icon: Icons.menu, //icon on Floating action button
-        activeIcon: Icons.close, //icon when menu is expanded on button
-        backgroundColor: Colors.greenAccent, //background color of button
-        foregroundColor: Colors.white, //font color, icon color in button
-        activeBackgroundColor: Colors.lightGreenAccent, //background color when menu is expanded
-        activeForegroundColor: Colors.white,
-        visible: true,
-        closeManually: false,
-        curve: Curves.bounceIn,
-        overlayColor: Colors.black,
-        overlayOpacity: 0.5,
-        onOpen: () => print('OPENING DIAL'), // action when menu opens
-        onClose: () => print('DIAL CLOSED'), //action when menu closes
+      floatingActionButton: Padding(
+        padding: const EdgeInsets.all(20.0),
+        child: SpeedDial( //Speed dial menu
+          icon: Icons.menu, //icon on Floating action button
+          activeIcon: Icons.close, //icon when menu is expanded on button
+          backgroundColor: Colors.greenAccent, //background color of button
+          foregroundColor: Colors.white, //font color, icon color in button
+          activeBackgroundColor: Colors.lightGreenAccent, //background color when menu is expanded
+          activeForegroundColor: Colors.white,
+          visible: true,
+          closeManually: false,
+          curve: Curves.bounceIn,
+          overlayColor: Colors.black,
+          overlayOpacity: 0.5,
 
-        elevation: 8.0, //shadow elevation of button
-        shape: const CircleBorder(), //shape of button
+          elevation: 8.0, //shadow elevation of button
+          shape: const CircleBorder(), //shape of button
 
-        children: [
-          SpeedDialChild(
-            child: const Icon(Icons.shopping_bag),
-            backgroundColor: Colors.blue,
-            foregroundColor: Colors.white,
-            label: 'Plastic',
-            labelStyle: const TextStyle(fontSize: 18.0),
-            onTap: () async {
-              await showDialog(
-                context: context,
-                builder: (BuildContext context) => upload_dialog(context, 'plastic'),
-              );
-            },
-          ),
-          SpeedDialChild(
-            child: const Icon(Icons.iron),
-            backgroundColor: Colors.blue,
-            foregroundColor: Colors.white,
-            label: 'Metal',
-            labelStyle: const TextStyle(fontSize: 18.0),
-            onTap: () async {
-              await showDialog(
-                context: context,
-                builder: (BuildContext context) => upload_dialog(context, 'metal'),
-              );
-            },
-          ),
-          SpeedDialChild(
-            child: const Icon(Icons.card_giftcard),
-            backgroundColor: Colors.blue,
-            foregroundColor: Colors.white,
-            label: 'Cardboard',
-            labelStyle: const TextStyle(fontSize: 18.0),
-            onTap: () async {
-              await showDialog(
-                context: context,
-                builder: (BuildContext context) => upload_dialog(context, 'cardboard'),
-              );
-            },
-          ),
-          SpeedDialChild(
-            child: const Icon(Icons.newspaper),
-            backgroundColor: Colors.blue,
-            foregroundColor: Colors.white,
-            label: 'Paper',
-            labelStyle: const TextStyle(fontSize: 18.0),
-            onTap: () async {
-              await showDialog(
-                context: context,
-                builder: (BuildContext context) => upload_dialog(context, 'paper'),
-              );
-            },
-          ),
-          SpeedDialChild(
-            child: Icon(Icons.hourglass_bottom),
-            backgroundColor: Colors.blue,
-            foregroundColor: Colors.white,
-            label: 'Glass',
-            labelStyle: TextStyle(fontSize: 18.0),
-            onTap: () async {
-              await showDialog(
-                context: context,
-                builder: (BuildContext context) => upload_dialog(context, 'glass'),
-              );
-            },
-          ),
-          SpeedDialChild(
-            child: Icon(Icons.currency_bitcoin),
-            backgroundColor: Colors.blue,
-            foregroundColor: Colors.white,
-            label: 'Trash',
-            labelStyle: TextStyle(fontSize: 18.0),
-            onTap: () async {
-              await showDialog(
-                context: context,
-                builder: (BuildContext context) => upload_dialog(context, 'trash'),
-              );
-            },
-          ),
+          children: [
+            SpeedDialChild(
+              child: const Icon(Icons.shopping_bag),
+              backgroundColor: Colors.blue,
+              foregroundColor: Colors.white,
+              label: 'Plastic',
+              labelStyle: const TextStyle(fontSize: 18.0),
+              onTap: () async {
+                await showDialog(
+                  context: context,
+                  builder: (BuildContext context) => upload_dialog(context, 'plastic'),
+                );
+              },
+            ),
+            SpeedDialChild(
+              child: const Icon(Icons.iron),
+              backgroundColor: Colors.blue,
+              foregroundColor: Colors.white,
+              label: 'Metal',
+              labelStyle: const TextStyle(fontSize: 18.0),
+              onTap: () async {
+                await showDialog(
+                  context: context,
+                  builder: (BuildContext context) => upload_dialog(context, 'metal'),
+                );
+              },
+            ),
+            SpeedDialChild(
+              child: const Icon(Icons.card_giftcard),
+              backgroundColor: Colors.blue,
+              foregroundColor: Colors.white,
+              label: 'Cardboard',
+              labelStyle: const TextStyle(fontSize: 18.0),
+              onTap: () async {
+                await showDialog(
+                  context: context,
+                  builder: (BuildContext context) => upload_dialog(context, 'cardboard'),
+                );
+              },
+            ),
+            SpeedDialChild(
+              child: const Icon(Icons.newspaper),
+              backgroundColor: Colors.blue,
+              foregroundColor: Colors.white,
+              label: 'Paper',
+              labelStyle: const TextStyle(fontSize: 18.0),
+              onTap: () async {
+                await showDialog(
+                  context: context,
+                  builder: (BuildContext context) => upload_dialog(context, 'paper'),
+                );
+              },
+            ),
+            SpeedDialChild(
+              child: Icon(Icons.hourglass_bottom),
+              backgroundColor: Colors.blue,
+              foregroundColor: Colors.white,
+              label: 'Glass',
+              labelStyle: TextStyle(fontSize: 18.0),
+              onTap: () async {
+                await showDialog(
+                  context: context,
+                  builder: (BuildContext context) => upload_dialog(context, 'glass'),
+                );
+              },
+            ),
+            SpeedDialChild(
+              child: Icon(Icons.currency_bitcoin),
+              backgroundColor: Colors.blue,
+              foregroundColor: Colors.white,
+              label: 'Trash',
+              labelStyle: TextStyle(fontSize: 18.0),
+              onTap: () async {
+                await showDialog(
+                  context: context,
+                  builder: (BuildContext context) => upload_dialog(context, 'trash'),
+                );
+              },
+            ),
 
-        ],
+          ],
+        ),
       ),
-      // floatingActionButton: FloatingActionButton(
-      //   // Provide an onPressed callback.
-      //   onPressed: () async {
-      //     try {
-      //       upload();
-      //       if (loading) {
-      //         Center(
-      //           child: CircularProgressIndicator(),
-      //         );
-      //       }
-      //       // pop up
-      //       await showDialog(
-      //         context: context,
-      //         builder: (BuildContext context) => _buildPopupDialog(context),
-      //       );
-      //
-      //       Navigator.of(context).pop();
-      //     } catch (e) {
-      //       // If an error occurs, log the error to the console.
-      //       print(e);
-      //     }
-      //   },
-      //   child: const Icon(Icons.check),
-      // ),
+      floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
+
     );
   }
 }
