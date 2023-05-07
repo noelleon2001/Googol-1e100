@@ -1,6 +1,8 @@
 
 # Bin Brain: Googol 1e100
 
+[![](https://markdown-videos.deta.dev/youtube/cjYlwLRakrk)](https://youtu.be/cjYlwLRakrk)
+
 BinBrain is an innovative app that uses advanced object detection with a waste classification model to make recycling easier and more accessible for everyone. Developed using Google technologies such as Flutter, MLKit, Firebase and Google Cloud Storage as well as TensorFlow, Binbrain is a solution targeting to achieve three of the Sustainable Development Goals (SDGs), which are Sustainable Cities and Communities, Responsible Consumption, Life below Water and Life on Land. 
 
 ## Getting Started
